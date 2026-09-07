@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-accent: #00ff00;
+  --color-border: #333333;
+  --color-muted: #888888;
+  
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    --accent: #00ff00;
+    --border: #333333;
+    --muted: #888888;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: var(--font-sans);
+    background-image: radial-gradient(circle at center, #333 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+  }
+}
+
+@layer utilities {
+  .brutalist-border {
+    border: 2px solid var(--border);
+    box-shadow: 4px 4px 0px var(--accent);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .brutalist-border:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--accent);
+  }
+
+  .brutalist-button {
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 2px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--accent);
+    transition: all 0.2s ease;
+  }
+
+  .brutalist-button:hover {
+    background-color: var(--accent);
+    color: var(--background);
+    box-shadow: 2px 2px 0px var(--foreground);
+    transform: translate(2px, 2px);
+  }
+
+  .scramble-text {
+    /* To be implemented via JS */
+  }
+}
