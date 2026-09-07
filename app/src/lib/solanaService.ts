@@ -2,6 +2,9 @@ import {
   Connection,
   PublicKey,
   Keypair,
+  Transaction,
+  TransactionInstruction,
+  sendAndConfirmTransaction,
   clusterApiUrl,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -10,6 +13,7 @@ import { verifySignature } from './cryptoUtils';
 
 export const SOLANA_DEVNET_RPC = clusterApiUrl('devnet');
 export const PROGRAM_ID = new PublicKey('UrnaSoL111111111111111111111111111111111111');
+export const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 
 export interface OnChainSubmissionResult {
   success: boolean;
@@ -22,6 +26,9 @@ export interface OnChainSubmissionResult {
   merkleRootRecorded: string;
   explorerUrl: string;
   isSimulated: boolean;
+  isLiveOnChain: boolean;
+  faucetNotice?: string;
+  organizerPubkey: string;
 }
 
 export class SolanaService {
@@ -48,6 +55,42 @@ export class SolanaService {
 
   getOrganizerPublicKey(): string {
     return this.organizerKeypair.publicKey.toBase58();
+  }
+
+  async getOrganizerBalance(): Promise<number> {
+    try {
+      const bal = await this.connection.getBalance(this.organizerKeypair.publicKey);
+      return bal / 1_000_000_000;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * Tenta solicitar fundos no Faucet da Devnet
+   */
+  async requestAirdrop(): Promise<{ success: boolean; message: string }> {
+    try {
+      const sig = await this.connection.requestAirdrop(
+        this.organizerKeypair.publicKey,
+        1_000_000_000
+      );
+      await this.connection.confirmTransaction(sig, 'confirmed');
+      return {
+        success: true,
+        message: '1 SOL recebido com sucesso na Devnet!',
+      };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Falha no airdrop da Devnet';
+      if (msg.includes('429') || msg.includes('limit') || msg.includes('dry')) {
+        return {
+          success: false,
+          message:
+            'O faucet público RPC da Solana atingiu o limite de requisições por IP (HTTP 429). Utilize https://faucet.solana.com para transferir SOL para a carteira da eleição.',
+        };
+      }
+      return { success: false, message: msg };
+    }
   }
 
   /**
@@ -95,7 +138,9 @@ export class SolanaService {
 
   /**
    * Envia o Boletim de Urna assinado para a Solana.
-   * Valida a assinatura Ed25519 da Urna, computa o digest e grava o BU e Merkle Root no estado on-chain.
+   * Se a carteira tiver saldo na Devnet, envia uma transação REAL on-chain registrando
+   * o hash do BU e a raiz de Merkle na Solana Devnet via SPL Memo Program.
+   * Se não houver saldo ou o faucet estiver bloqueado, registra em modo Air-Gap Local com integridade criptográfica.
    */
   async submitBoletimUrnaToSolana(
     election: Election,
@@ -111,20 +156,63 @@ export class SolanaService {
     const [urnaPda] = this.deriveUrnaPda(electionPda, bu.urnaId);
     const [buPda] = this.deriveBuPda(electionPda, urnaPda);
 
-    // Tentativa de obter slot real da Devnet para registro verídico
     let currentSlot = 320914820;
     try {
       currentSlot = await this.connection.getSlot('confirmed');
     } catch {
-      // Fallback gracioso se offline
+      // Slot fallback
     }
 
-    // Gera assinatura de transação determinística ou real no padrão Solana Base58
-    const mockTxBuffer = new Uint8Array(64);
-    crypto.getRandomValues(mockTxBuffer);
-    const txSignature = bs58.encode(mockTxBuffer);
+    let txSignature = '';
+    let isLiveOnChain = false;
+    let faucetNotice = '';
 
-    // Persiste o estado on-chain localmente para permitir auditoria contínua mesmo offline
+    // Verifica se a carteira tem saldo na Devnet
+    let balance = 0;
+    try {
+      balance = await this.connection.getBalance(this.organizerKeypair.publicKey);
+    } catch {
+      // Ignora erro de consulta se offline
+    }
+
+    // Se tiver saldo de pelo menos 5.000 lamports (taxa de rede), envia transação REAL
+    if (balance >= 5000) {
+      try {
+        const memoPayload = `URNASOL:BU:${election.id}:${bu.urnaId}:TOTAL:${bu.totalVotes}:ROOT:${bu.merkleRoot.slice(0, 16)}:SIG:${bu.ed25519Signature.slice(0, 16)}`;
+        const memoInstruction = new TransactionInstruction({
+          keys: [{ pubkey: this.organizerKeypair.publicKey, isSigner: true, isWritable: true }],
+          programId: MEMO_PROGRAM_ID,
+          data: Buffer.from(memoPayload, 'utf-8'),
+        });
+
+        const tx = new Transaction().add(memoInstruction);
+        const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+        tx.recentBlockhash = blockhash;
+        tx.feePayer = this.organizerKeypair.publicKey;
+
+        txSignature = await sendAndConfirmTransaction(
+          this.connection,
+          tx,
+          [this.organizerKeypair],
+          { commitment: 'confirmed' }
+        );
+
+        isLiveOnChain = true;
+      } catch (e) {
+        console.warn('Falha ao enviar transação ao vivo para Devnet, usando fallback local:', e);
+      }
+    }
+
+    // Se não enviou na Devnet (sem fundos ou faucet rate-limited), gera registro de fallback e avisa
+    if (!isLiveOnChain) {
+      const mockTxBuffer = new Uint8Array(64);
+      crypto.getRandomValues(mockTxBuffer);
+      txSignature = bs58.encode(mockTxBuffer);
+      faucetNotice =
+        'A carteira da eleição ainda não possui SOL de taxa na Devnet pública (o faucet padrão rate-limitou). O BU foi registrado e verificado localmente com criptografia Ed25519 e Merkle Tree. Para publicar uma transação visível no Solana Explorer, transfira 0.01 SOL de teste no faucet oficial para a carteira da eleição.';
+    }
+
+    // Persiste o estado on-chain localmente para auditoria contínua
     const onChainRecord = {
       electionId: election.id,
       electionPda: electionPda.toBase58(),
@@ -141,9 +229,13 @@ export class SolanaService {
       txSignature,
       slot: currentSlot,
       timestamp: Date.now(),
+      isLiveOnChain,
     };
 
-    localStorage.setItem(`urnasol_onchain_bu_${election.id}_${bu.urnaId}`, JSON.stringify(onChainRecord));
+    localStorage.setItem(
+      `urnasol_onchain_bu_${election.id}_${bu.urnaId}`,
+      JSON.stringify(onChainRecord)
+    );
 
     return {
       success: true,
@@ -155,7 +247,10 @@ export class SolanaService {
       buPda: buPda.toBase58(),
       merkleRootRecorded: bu.merkleRoot,
       explorerUrl: `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`,
-      isSimulated: false,
+      isSimulated: !isLiveOnChain,
+      isLiveOnChain,
+      faucetNotice: isLiveOnChain ? undefined : faucetNotice,
+      organizerPubkey: this.organizerKeypair.publicKey.toBase58(),
     };
   }
 
@@ -176,6 +271,7 @@ export class SolanaService {
       slot: number;
       timestamp: number;
       receiptLeaves: string[];
+      isLiveOnChain?: boolean;
     }> = [];
 
     for (let i = 0; i < localStorage.length; i++) {
@@ -185,7 +281,7 @@ export class SolanaService {
           const item = JSON.parse(localStorage.getItem(key) || '{}');
           records.push(item);
         } catch {
-          // Ignora registros corrompidos
+          // Ignora
         }
       }
     }

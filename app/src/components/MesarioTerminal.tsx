@@ -42,9 +42,9 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
 
   // Mesário libera cabine para o eleitor
   const handleReleaseBooth = (voter: VoterPin) => {
-    // Atualiza estado do votante como autorizado/em processo
+    // Atualiza estado do votante como AUTORIZADO para votar (mas NÃO marca como usado ainda!)
     const updatedVoters = election.voterPins.map((v) =>
-      v.pin === voter.pin ? { ...v, isUsed: true, usedAt: Date.now() } : v
+      v.pin === voter.pin ? { ...v, isAuthorized: true } : v
     );
 
     const updatedElection: Election = {
@@ -196,7 +196,11 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                     {voter.isUsed ? (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <CheckCircle className="w-3.5 h-3.5" />
-                        Compareceu
+                        Já Votou (Concluído)
+                      </span>
+                    ) : voter.isAuthorized ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                        Cabine Liberada
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-white/5">
@@ -207,7 +211,7 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                   <td className="py-3.5 px-4 text-right">
                     {voter.isUsed ? (
                       <span className="text-xs text-slate-500 font-mono">
-                        Liberado às {voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : '10:00'}
+                        Votou às {voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : '10:00'}
                       </span>
                     ) : (
                       <button
@@ -215,7 +219,7 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                         className="btn-primary py-1.5 px-3 text-xs"
                       >
                         <KeyRound className="w-3.5 h-3.5" />
-                        <span>Liberar Voto</span>
+                        <span>{voter.isAuthorized ? 'Ver PIN' : 'Liberar Voto'}</span>
                       </button>
                     )}
                   </td>

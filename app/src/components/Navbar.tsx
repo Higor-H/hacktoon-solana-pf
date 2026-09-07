@@ -8,7 +8,9 @@ import {
   Wifi, 
   WifiOff, 
   Volume2, 
-  VolumeX 
+  VolumeX,
+  Ban,
+  CheckCircle2
 } from 'lucide-react';
 
 export type TabType = 'urna' | 'mesario' | 'bu' | 'auditoria' | 'admin';
@@ -21,6 +23,8 @@ interface NavbarProps {
   audioMuted: boolean;
   setAudioMuted: (muted: boolean) => void;
   electionTitle: string;
+  electionStatus?: 'draft' | 'active' | 'closed';
+  onToggleCloseElection?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,7 +35,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   audioMuted,
   setAudioMuted,
   electionTitle,
+  electionStatus = 'active',
+  onToggleCloseElection,
 }) => {
+  const isClosed = electionStatus === 'closed';
+
   return (
     <header className="border-b border-white/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,9 +57,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="font-extrabold text-xl tracking-tight font-display bg-gradient-to-r from-white via-slate-100 to-emerald-400 bg-clip-text text-transparent">
                   UrnaSol
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
-                  Solana E2E-V
-                </span>
+                {isClosed ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/30 uppercase tracking-wider flex items-center gap-1">
+                    <Ban className="w-3 h-3" />
+                    Encerrada
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Votação Aberta
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 hidden sm:block truncate max-w-xs font-mono">
                 {electionTitle}
@@ -106,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Auditoria On-Chain</span>
+              <span>Apuração & Auditoria</span>
             </button>
 
             <button
@@ -122,9 +138,25 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Controles de Ambiente: Offline / Áudio */}
+          {/* Controles de Ambiente: Encerramento / Offline / Áudio */}
           <div className="flex items-center gap-2">
             
+            {/* Botão de Encerramento Rápido de Eleição */}
+            {onToggleCloseElection && (
+              <button
+                onClick={onToggleCloseElection}
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                  isClosed
+                    ? 'bg-slate-800 text-slate-300 border-white/20 hover:bg-slate-700'
+                    : 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25'
+                }`}
+                title={isClosed ? "Reabrir eleição" : "Encerrar votação oficial e lacrar urnas"}
+              >
+                <Ban className="w-3.5 h-3.5" />
+                <span>{isClosed ? 'Reabrir Pleito' : 'Encerrar Votação'}</span>
+              </button>
+            )}
+
             {/* Toggle Modo Offline Air-Gap */}
             <button
               onClick={() => setIsOfflineMode(!isOfflineMode)}
@@ -138,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {isOfflineMode ? (
                 <>
                   <WifiOff className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Urna Offline (Air-Gap)</span>
+                  <span className="hidden sm:inline">Urna Offline</span>
                 </>
               ) : (
                 <>
@@ -184,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setCurrentTab('auditoria')}
             className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'auditoria' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
           >
-            Auditoria
+            Apuração
           </button>
           <button
             onClick={() => setCurrentTab('admin')}

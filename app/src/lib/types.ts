@@ -24,7 +24,8 @@ export interface VoterPin {
   pin: string;
   voterIdentifier: string; // Ex: "Apto 102 - Torre A" ou "Matrícula 20241029"
   voterName?: string;
-  isUsed: boolean;
+  isAuthorized?: boolean; // Mesário liberou a cabine para o eleitor
+  isUsed: boolean; // Eleitor já concluiu o voto na cabine (voto gravado no RDV)
   usedAt?: number;
   createdAt: number;
 }

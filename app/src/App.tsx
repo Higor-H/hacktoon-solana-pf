@@ -8,6 +8,7 @@ import { AuditoriaPortal } from './components/AuditoriaPortal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { createDefaultElection } from './lib/electionPresets';
 import type { Election } from './lib/types';
+import { offlineUrnaService } from './lib/offlineUrna';
 import { ShieldCheck, HardDrive, Cpu, Terminal } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -15,7 +16,17 @@ export const App: React.FC = () => {
     const saved = localStorage.getItem('urnasol_election_data');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Sanitiza os pins: se não houver votos gravados nas urnas, desmarca isUsed residual
+        const totalVotes = (parsed.urnas || []).flatMap((u: { id: string }) => offlineUrnaService.getVotes(u.id)).length;
+        if (totalVotes === 0 && parsed.voterPins) {
+          parsed.voterPins = parsed.voterPins.map((v: { pin: string }) => ({
+            ...v,
+            isUsed: false,
+            usedAt: undefined,
+          }));
+        }
+        return parsed;
       } catch {
         // Fallback
       }
@@ -48,6 +59,19 @@ export const App: React.FC = () => {
     setCurrentTab('urna');
   };
 
+  // Alterna encerramento oficial da eleição
+  const handleToggleCloseElection = async () => {
+    if (election.status === 'active') {
+      for (const u of election.urnas) {
+        await offlineUrnaService.closeUrnaAndGenerateBU(election, u);
+      }
+      setElection((prev) => ({ ...prev, status: 'closed' }));
+      setCurrentTab('auditoria');
+    } else {
+      setElection((prev) => ({ ...prev, status: 'active' }));
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-black">
       
@@ -60,6 +84,8 @@ export const App: React.FC = () => {
         audioMuted={audioMuted}
         setAudioMuted={setAudioMuted}
         electionTitle={election.title}
+        electionStatus={election.status}
+        onToggleCloseElection={handleToggleCloseElection}
       />
 
       {/* Seletor Rápido de Urna Físico (Caso haja mais de uma urna) */}
@@ -95,6 +121,7 @@ export const App: React.FC = () => {
           <UrnaTerminal
             election={election}
             selectedUrna={currentUrna}
+            onUpdateElection={setElection}
             audioMuted={audioMuted}
             onGoToAuditoria={handleGoToAuditoria}
           />
@@ -112,7 +139,9 @@ export const App: React.FC = () => {
           <BoletimUrnaView
             election={election}
             selectedUrna={currentUrna}
+            onUrnaSubmitted={() => {}}
             onGoToAuditoria={() => setCurrentTab('auditoria')}
+            onUpdateElection={setElection}
           />
         )}
 
@@ -120,6 +149,7 @@ export const App: React.FC = () => {
           <AuditoriaPortal
             election={election}
             initialReceiptCode={auditReceiptCode}
+            onUpdateElection={setElection}
           />
         )}
 

@@ -5,16 +5,21 @@ import {
   Copy, 
   ExternalLink, 
   Sparkles,
-  Lock
+  Lock,
+  AlertTriangle,
+  KeyRound,
+  UserCheck,
+  Ban
 } from 'lucide-react';
 import QRCodeSVG from 'qrcode';
-import type { Election, UrnaDevice } from '../lib/types';
+import type { Election, UrnaDevice, VoterPin } from '../lib/types';
 import { offlineUrnaService } from '../lib/offlineUrna';
 import { urnaAudio } from '../lib/audio';
 
 interface UrnaTerminalProps {
   election: Election;
   selectedUrna: UrnaDevice;
+  onUpdateElection: (updated: Election) => void;
   onVoteSuccess?: (receiptCode: string, receiptHash: string) => void;
   audioMuted: boolean;
   onGoToAuditoria: (receiptCode: string) => void;
@@ -23,14 +28,25 @@ interface UrnaTerminalProps {
 export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
   election,
   selectedUrna,
+  onUpdateElection,
   onVoteSuccess,
   audioMuted,
   onGoToAuditoria,
 }) => {
-  // Estado dos dígitos digitados (geralmente 2 dígitos)
+  // Estados da Urna:
+  // 'locked' = aguardando o eleitor digitar o PIN de 6 dígitos gerado pelo mesário
+  // 'voting' = cabine liberada para o eleitor digitar o candidato
+  // 'fim'    = voto computado, exibindo tela de FIM e comprovante
+  const [screenState, setScreenState] = useState<'locked' | 'voting' | 'fim'>('locked');
+  
+  // PIN de autenticação do eleitor (6 dígitos)
+  const [pinDigits, setPinDigits] = useState<string[]>([]);
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [authorizedVoter, setAuthorizedVoter] = useState<VoterPin | null>(null);
+
+  // Dígitos do candidato (2 dígitos)
   const [digits, setDigits] = useState<string[]>([]);
   const [isBranco, setIsBranco] = useState(false);
-  const [screenState, setScreenState] = useState<'voting' | 'fim'>('voting');
   const [receiptData, setReceiptData] = useState<{
     code: string;
     hash: string;
@@ -38,135 +54,223 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Voto requer 2 dígitos para este cargo
+  const PIN_LENGTH = 6;
   const DIGITS_COUNT = 2;
 
-  // Encontra o candidato correspondente aos dígitos informados
+  // Candidato correspondente
   const typedNumber = digits.length === DIGITS_COUNT ? parseInt(digits.join(''), 10) : null;
   const matchedCandidate = typedNumber !== null ? election.candidates.find((c) => c.number === typedNumber) : null;
   const isNulo = digits.length === DIGITS_COUNT && !matchedCandidate && !isBranco;
 
-  // Efeito sonoro do clique de teclado
+  // Efeitos sonoros
   const playBeep = useCallback(() => {
-    if (!audioMuted) {
-      urnaAudio.playKeypress();
-    }
+    if (!audioMuted) urnaAudio.playKeypress();
   }, [audioMuted]);
 
   const playAlertSound = useCallback(() => {
-    if (!audioMuted) {
-      urnaAudio.playAlert();
-    }
+    if (!audioMuted) urnaAudio.playAlert();
   }, [audioMuted]);
 
   const playConfirmSound = useCallback(() => {
-    if (!audioMuted) {
-      urnaAudio.playConfirm();
-    }
+    if (!audioMuted) urnaAudio.playConfirm();
   }, [audioMuted]);
 
-  // Manipulação de dígitos numéricos
-  const handleDigit = useCallback((d: number) => {
-    if (screenState === 'fim') return;
-    if (isBranco) {
-      setIsBranco(false);
-    }
-    if (digits.length < DIGITS_COUNT) {
-      playBeep();
-      setDigits((prev) => [...prev, d.toString()]);
-    } else {
+  // Se a eleição foi encerrada, bloqueia a cabine
+  const isElectionClosed = election.status === 'closed';
+
+  // Desbloqueia a cabine com um PIN válido
+  const handleAuthorizeWithPin = useCallback((pinString: string) => {
+    setPinError(null);
+    const voter = election.voterPins.find((v) => v.pin === pinString);
+
+    if (!voter) {
       playAlertSound();
+      setPinError('PIN NÃO ENCONTRADO! Solicite a autorização na mesa do mesário.');
+      return;
     }
-  }, [digits.length, isBranco, screenState, playBeep, playAlertSound]);
+
+    // REGRA DE NÃO DUPLICIDADE: Eleitor já votou?
+    if (voter.isUsed) {
+      playAlertSound();
+      const horaVoto = voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : 'anteriormente';
+      setPinError(
+        `⛔ VOTO DUPLICADO REJEITADO! O eleitor ${voter.voterIdentifier} (${voter.voterName || 'Eleitor'}) já votou às ${horaVoto}. É estritamente proibido votar mais de uma vez.`
+      );
+      return;
+    }
+
+    // Eleitor apto: libera a cabine
+    playBeep();
+    setAuthorizedVoter(voter);
+    setScreenState('voting');
+    setPinDigits([]);
+    setPinError(null);
+  }, [election.voterPins, playAlertSound, playBeep]);
+
+  // Digitação de dígitos (PIN ou Candidato)
+  const handleDigit = useCallback((d: number) => {
+    if (isElectionClosed || screenState === 'fim') return;
+
+    if (screenState === 'locked') {
+      // Digitou PIN
+      if (pinDigits.length < PIN_LENGTH) {
+        playBeep();
+        const next = [...pinDigits, d.toString()];
+        setPinDigits(next);
+        if (next.length === PIN_LENGTH) {
+          // Autoverifica quando atinge 6 dígitos
+          handleAuthorizeWithPin(next.join(''));
+        }
+      } else {
+        playAlertSound();
+      }
+    } else if (screenState === 'voting') {
+      // Digitou candidato
+      if (isBranco) setIsBranco(false);
+      if (digits.length < DIGITS_COUNT) {
+        playBeep();
+        setDigits((prev) => [...prev, d.toString()]);
+      } else {
+        playAlertSound();
+      }
+    }
+  }, [
+    isElectionClosed,
+    screenState,
+    pinDigits,
+    digits.length,
+    isBranco,
+    playBeep,
+    playAlertSound,
+    handleAuthorizeWithPin,
+  ]);
 
   // Tecla BRANCO
   const handleBranco = useCallback(() => {
-    if (screenState === 'fim') return;
+    if (isElectionClosed || screenState !== 'voting') return;
     if (digits.length === 0) {
       playBeep();
       setIsBranco(true);
     } else {
       playAlertSound();
     }
-  }, [digits.length, screenState, playBeep, playAlertSound]);
+  }, [isElectionClosed, screenState, digits.length, playBeep, playAlertSound]);
 
   // Tecla CORRIGE
   const handleCorrige = useCallback(() => {
-    if (screenState === 'fim') return;
+    if (isElectionClosed || screenState === 'fim') return;
     playAlertSound();
-    setDigits([]);
-    setIsBranco(false);
-  }, [screenState, playAlertSound]);
+
+    if (screenState === 'locked') {
+      setPinDigits([]);
+      setPinError(null);
+    } else if (screenState === 'voting') {
+      setDigits([]);
+      setIsBranco(false);
+    }
+  }, [isElectionClosed, screenState, playAlertSound]);
 
   // Tecla CONFIRMA
   const handleConfirma = useCallback(async () => {
-    if (screenState === 'fim') return;
+    if (isElectionClosed) return;
 
-    let candidateChoice: number | 'BRANCO' | 'NULO' | null = null;
-
-    if (isBranco) {
-      candidateChoice = 'BRANCO';
-    } else if (digits.length === DIGITS_COUNT) {
-      candidateChoice = matchedCandidate ? matchedCandidate.number : 'NULO';
-    }
-
-    if (candidateChoice === null) {
-      playAlertSound();
+    if (screenState === 'locked') {
+      if (pinDigits.length === PIN_LENGTH) {
+        handleAuthorizeWithPin(pinDigits.join(''));
+      } else {
+        playAlertSound();
+        setPinError('Insira os 6 dígitos do PIN fornecido pelo mesário.');
+      }
       return;
     }
 
-    // Toca o famoso som de confirmação da urna
-    playConfirmSound();
-    setScreenState('fim');
+    if (screenState === 'voting') {
+      let candidateChoice: number | 'BRANCO' | 'NULO' | null = null;
 
-    try {
-      // Grava no RDV offline com comprovante criptográfico
-      const { receiptCode, receiptHash } = await offlineUrnaService.castVote(
-        election,
-        selectedUrna,
-        candidateChoice
-      );
-
-      // Gera QR Code do comprovante
-      const qrDataUrl = await QRCodeSVG.toDataURL(
-        JSON.stringify({
-          tipo: 'COMPROVANTE_URNASOL',
-          eleicao: election.id,
-          urna: selectedUrna.id,
-          recibo: receiptCode,
-          hash: receiptHash,
-        }),
-        { width: 220, margin: 1 }
-      );
-
-      setReceiptData({
-        code: receiptCode,
-        hash: receiptHash,
-        qrUrl: qrDataUrl,
-      });
-
-      if (onVoteSuccess) {
-        onVoteSuccess(receiptCode, receiptHash);
+      if (isBranco) {
+        candidateChoice = 'BRANCO';
+      } else if (digits.length === DIGITS_COUNT) {
+        candidateChoice = matchedCandidate ? matchedCandidate.number : 'NULO';
       }
-    } catch (err) {
-      console.error('Erro ao gravar voto offline:', err);
+
+      if (candidateChoice === null) {
+        playAlertSound();
+        return;
+      }
+
+      // Toca o som oficial da Urna do TSE
+      playConfirmSound();
+      setScreenState('fim');
+
+      try {
+        // 1. Grava voto no RDV offline da Urna
+        const { receiptCode, receiptHash } = await offlineUrnaService.castVote(
+          election,
+          selectedUrna,
+          candidateChoice
+        );
+
+        // 2. CRÍTICO: Marca o PIN do eleitor como USADO (impede duplicidade permanentemente)
+        if (authorizedVoter) {
+          const updatedVoterPins = election.voterPins.map((v) =>
+            v.pin === authorizedVoter.pin
+              ? { ...v, isUsed: true, usedAt: Date.now() }
+              : v
+          );
+
+          onUpdateElection({
+            ...election,
+            totalVotesCast: election.totalVotesCast + 1,
+            voterPins: updatedVoterPins,
+          });
+        }
+
+        // 3. Gera QR Code do comprovante individual
+        const qrDataUrl = await QRCodeSVG.toDataURL(
+          JSON.stringify({
+            tipo: 'COMPROVANTE_URNASOL',
+            eleicao: election.id,
+            urna: selectedUrna.id,
+            recibo: receiptCode,
+            hash: receiptHash,
+          }),
+          { width: 220, margin: 1 }
+        );
+
+        setReceiptData({
+          code: receiptCode,
+          hash: receiptHash,
+          qrUrl: qrDataUrl,
+        });
+
+        if (onVoteSuccess) {
+          onVoteSuccess(receiptCode, receiptHash);
+        }
+      } catch (err) {
+        console.error('Erro ao gravar voto offline:', err);
+      }
     }
   }, [
+    isElectionClosed,
     screenState,
+    pinDigits,
+    handleAuthorizeWithPin,
+    playAlertSound,
     isBranco,
     digits.length,
     matchedCandidate,
+    playConfirmSound,
     election,
     selectedUrna,
-    playConfirmSound,
-    playAlertSound,
+    authorizedVoter,
+    onUpdateElection,
     onVoteSuccess,
   ]);
 
-  // Suporte a teclado físico do computador
+  // Suporte a teclado do computador
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (screenState === 'fim') return;
+      if (isElectionClosed || screenState === 'fim') return;
 
       if (e.key >= '0' && e.key <= '9') {
         handleDigit(parseInt(e.key, 10));
@@ -179,14 +283,17 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleDigit, handleConfirma, handleCorrige, screenState]);
+  }, [handleDigit, handleConfirma, handleCorrige, isElectionClosed, screenState]);
 
-  // Próximo Eleitor (reinicia a cabine)
+  // Próximo Eleitor (bloqueia a cabine e aguarda novo PIN)
   const handleNextVoter = () => {
     setDigits([]);
     setIsBranco(false);
     setReceiptData(null);
-    setScreenState('voting');
+    setPinDigits([]);
+    setAuthorizedVoter(null);
+    setPinError(null);
+    setScreenState('locked');
   };
 
   const handleCopyCode = () => {
@@ -196,6 +303,9 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  // Eleitores aptos ainda pendentes de votação (para teste rápido)
+  const pendingVoters = election.voterPins.filter((v) => !v.isUsed);
 
   return (
     <div className="max-w-5xl mx-auto py-4 px-2 sm:px-4">
@@ -220,25 +330,73 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="badge-offline">
-            <Lock className="w-3 h-3" />
-            Voto Secreto RDV Ativo
-          </span>
-          <span className="text-xs text-slate-400 font-mono hidden md:inline">
-            Local: 100% Desconectado
-          </span>
+          {isElectionClosed ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+              <Ban className="w-3.5 h-3.5" />
+              ELEIÇÃO ENCERRADA
+            </span>
+          ) : (
+            <span className="badge-offline">
+              <Lock className="w-3 h-3" />
+              Anti-Duplicidade Ativo (1 Voto por Eleitor)
+            </span>
+          )}
         </div>
       </div>
+
+      {/* SELETOR DE ELEITOR PARA TESTE RÁPIDO (MODO DEMO DO HACKATHON) */}
+      {!isElectionClosed && screenState === 'locked' && (
+        <div className="mb-4 p-3 bg-purple-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-purple-300">
+            <KeyRound className="w-4 h-4 shrink-0 text-emerald-400" />
+            <span>
+              <strong>Atalho do Mesário:</strong> Selecione um eleitor apto abaixo para liberar a cabine com 1 clique:
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {pendingVoters.slice(0, 4).map((v) => (
+              <button
+                key={v.pin}
+                onClick={() => handleAuthorizeWithPin(v.pin)}
+                className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono transition-all"
+                title={`Liberar para ${v.voterIdentifier} (PIN: ${v.pin})`}
+              >
+                Liberar {v.voterIdentifier}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Gabinete Físico da Urna Eletrônica */}
       <div className="urna-chassis grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* TELA DA URNA (À Esquerda) */}
-        <div className="lg:col-span-7 urna-screen min-h-[440px] flex flex-col justify-between p-6 relative">
+        <div className="lg:col-span-7 urna-screen min-h-[460px] flex flex-col justify-between p-6 relative">
           
-          {screenState === 'voting' ? (
-            <>
-              {/* Cabeçalho da Tela */}
+          {/* CASO 1: ELEIÇÃO ENCERRADA */}
+          {isElectionClosed ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-12 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
+                <Ban className="w-8 h-8" />
+              </div>
+              <div className="text-3xl font-black font-display text-white">
+                VOTAÇÃO ENCERRADA
+              </div>
+              <p className="text-xs text-slate-300 max-w-sm">
+                A seção eleitoral foi finalizada. O Boletim de Urna (BU) com a apuração já está disponível para consulta e auditoria.
+              </p>
+              <button
+                onClick={() => onGoToAuditoria('')}
+                className="btn-primary text-xs py-2 px-4"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Ver Apuração & Votos por Candidato</span>
+              </button>
+            </div>
+          ) : screenState === 'locked' ? (
+            /* CASO 2: CABINE BLOQUEADA - AGUARDANDO AUTORIZAÇÃO / PIN DO ELEITOR */
+            <div className="flex-1 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-4">
                   <span className="text-xs tracking-widest uppercase font-mono text-emerald-400 font-bold">
@@ -249,22 +407,83 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
                   </span>
                 </div>
 
+                <div className="text-center py-4 space-y-3">
+                  <div className="inline-flex p-3 rounded-2xl bg-slate-900 border border-white/10 text-emerald-400 shadow-inner">
+                    <Lock className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold font-display text-white">
+                    Cabine Aguardando Eleitor
+                  </h3>
+                  <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                    Digite seu <strong>PIN de 6 dígitos</strong> fornecido na mesa do mesário para liberar a votação secreta:
+                  </p>
+
+                  {/* Caixas dos 6 dígitos do PIN */}
+                  <div className="flex justify-center gap-2 pt-2">
+                    {[...Array(PIN_LENGTH)].map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-10 h-14 rounded-lg border-2 flex items-center justify-center font-mono text-2xl font-bold transition-all ${
+                          pinDigits[idx] !== undefined
+                            ? 'border-emerald-400 bg-emerald-950/40 text-emerald-300 shadow-lg shadow-emerald-500/20'
+                            : idx === pinDigits.length
+                            ? 'border-white/50 bg-white/5 text-white animate-pulse'
+                            : 'border-white/15 bg-black/30 text-transparent'
+                        }`}
+                      >
+                        {pinDigits[idx] || (idx === pinDigits.length ? '_' : '')}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Mensagem de Erro / Alerta de Duplicidade */}
+                  {pinError && (
+                    <div className="mt-4 p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-left flex items-start gap-2.5 animate-fade-in">
+                      <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <p className="text-xs text-red-200 font-sans leading-relaxed">
+                        {pinError}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t border-emerald-500/20 pt-3 text-[11px] font-mono text-slate-400 text-center">
+                Digite os 6 números no teclado e tecle <span className="text-emerald-400 font-bold">CONFIRMA</span> ou <span className="text-orange-400 font-bold">CORRIGE</span> para apagar.
+              </div>
+            </div>
+          ) : screenState === 'voting' ? (
+            /* CASO 3: CABINE LIBERADA - ELEITOR VOTANDO */
+            <>
+              <div>
+                <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-3">
+                  <span className="text-xs tracking-widest uppercase font-mono text-emerald-400 font-bold">
+                    JUSTIÇA ELEITORAL • {election.institutionName.toUpperCase()}
+                  </span>
+                  {authorizedVoter && (
+                    <span className="text-xs font-mono text-emerald-300 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>{authorizedVoter.voterIdentifier}</span>
+                    </span>
+                  )}
+                </div>
+
                 <div className="text-xs uppercase font-mono text-slate-400 mb-1">
                   SEU VOTO PARA
                 </div>
-                <div className="text-2xl font-bold font-display text-white tracking-wide mb-6">
+                <div className="text-2xl font-bold font-display text-white tracking-wide mb-5">
                   {election.roleTitle}
                 </div>
 
                 {/* Campos de Dígitos ou Mensagem de Branco */}
                 {isBranco ? (
-                  <div className="my-8 py-6 text-center border-2 border-dashed border-white/20 rounded-xl bg-white/5">
+                  <div className="my-6 py-6 text-center border-2 border-dashed border-white/20 rounded-xl bg-white/5">
                     <span className="text-2xl sm:text-3xl font-extrabold font-display tracking-widest text-white animate-pulse">
                       VOTO EM BRANCO
                     </span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-3 mb-5">
                     <span className="text-xs uppercase font-mono text-slate-400">Número:</span>
                     <div className="flex gap-2">
                       {[...Array(DIGITS_COUNT)].map((_, idx) => (
@@ -287,17 +506,17 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
 
                 {/* Dados do Candidato Encontrado */}
                 {matchedCandidate && !isBranco && (
-                  <div className="animate-fade-in bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-4 flex gap-4 items-center">
+                  <div className="animate-fade-in bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-3 flex gap-4 items-center">
                     <img
                       src={matchedCandidate.photoUrl}
                       alt={matchedCandidate.name}
-                      className="w-20 h-20 rounded-lg object-cover border-2 border-emerald-400/50 shadow-md"
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-emerald-400/50 shadow-md"
                     />
                     <div className="space-y-1">
-                      <div className="text-xs uppercase font-mono text-emerald-400 font-bold">
+                      <div className="text-[11px] uppercase font-mono text-emerald-400 font-bold">
                         Candidato Oficial
                       </div>
-                      <div className="text-lg font-bold text-white font-display">
+                      <div className="text-base font-bold text-white font-display">
                         {matchedCandidate.name}
                       </div>
                       <div className="text-xs text-slate-300">
@@ -309,19 +528,19 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
 
                 {/* Voto Nulo */}
                 {isNulo && (
-                  <div className="animate-fade-in bg-orange-950/40 border border-orange-500/30 rounded-xl p-4 text-center">
-                    <div className="text-sm font-bold text-orange-400 uppercase font-mono">
+                  <div className="animate-fade-in bg-orange-950/40 border border-orange-500/30 rounded-xl p-3 text-center">
+                    <div className="text-xs font-bold text-orange-400 uppercase font-mono">
                       NÚMERO ERRADO
                     </div>
-                    <div className="text-xl font-black text-white font-display mt-1">
+                    <div className="text-lg font-black text-white font-display mt-0.5">
                       VOTO NULO
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Instruções Oficiais no Rodapé da Tela */}
-              <div className="border-t border-emerald-500/20 pt-3 mt-4 text-[11px] font-mono text-slate-300 space-y-1">
+              {/* Instruções de rodapé */}
+              <div className="border-t border-emerald-500/20 pt-3 mt-3 text-[11px] font-mono text-slate-300 space-y-1">
                 <div>Aperte a tecla:</div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-emerald-400">VERDE</span> para CONFIRMAR este voto
@@ -332,7 +551,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
               </div>
             </>
           ) : (
-            /* TELA DE "FIM" DA URNA */
+            /* CASO 4: TELA DE "FIM" DA URNA */
             <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
               <div className="urna-fim-text mb-2">FIM</div>
               <div className="text-sm font-mono text-emerald-400 uppercase tracking-widest">
@@ -349,7 +568,6 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
         {/* TECLADO FÍSICO DA URNA (À Direita) */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
           
-          {/* Logo da Justiça Eleitoral / UrnaSol no teclado */}
           <div className="text-center py-1 border-b border-slate-700/50">
             <span className="text-xs font-bold tracking-widest text-slate-400 uppercase font-display">
               JUSTIÇA ELEITORAL
@@ -362,7 +580,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
               <button
                 key={num}
                 onClick={() => handleDigit(num)}
-                disabled={screenState === 'fim'}
+                disabled={isElectionClosed || screenState === 'fim'}
                 className="urna-key-num"
               >
                 {num}
@@ -370,12 +588,12 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
             ))}
           </div>
 
-          {/* Linha do Zero centralizado */}
+          {/* Linha do Zero */}
           <div className="grid grid-cols-3 gap-2.5">
             <div />
             <button
               onClick={() => handleDigit(0)}
-              disabled={screenState === 'fim'}
+              disabled={isElectionClosed || screenState === 'fim'}
               className="urna-key-num"
             >
               0
@@ -383,11 +601,11 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
             <div />
           </div>
 
-          {/* Teclas de Comando Oficiais: BRANCO, CORRIGE, CONFIRMA */}
+          {/* Teclas Oficiais: BRANCO, CORRIGE, CONFIRMA */}
           <div className="grid grid-cols-3 gap-2.5 pt-3 items-end">
             <button
               onClick={handleBranco}
-              disabled={screenState === 'fim'}
+              disabled={isElectionClosed || screenState !== 'voting'}
               className="urna-key-action key-branco h-[52px]"
             >
               <span>BRANCO</span>
@@ -395,7 +613,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
 
             <button
               onClick={handleCorrige}
-              disabled={screenState === 'fim'}
+              disabled={isElectionClosed || screenState === 'fim'}
               className="urna-key-action key-corrige h-[52px]"
             >
               <span>CORRIGE</span>
@@ -403,7 +621,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
 
             <button
               onClick={handleConfirma}
-              disabled={screenState === 'fim'}
+              disabled={isElectionClosed || screenState === 'fim'}
               className="urna-key-action key-confirma"
             >
               <span>CONFIRMA</span>
@@ -411,13 +629,15 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
           </div>
 
           <div className="text-[11px] text-center text-slate-500 font-mono pt-1">
-            Dica: você também pode usar o teclado numérico do seu computador (Enter = Confirma, Backspace = Corrige).
+            {screenState === 'locked'
+              ? 'Digite o PIN de 6 dígitos no teclado ou use os botões rápidos.'
+              : 'Digite os 2 números do candidato e confirme.'}
           </div>
         </div>
 
       </div>
 
-      {/* MODAL / RECIBO DE COMPROVAÇÃO DE VOTAÇÃO (E2E-V) */}
+      {/* MODAL DO COMPROVANTE DE VOTAÇÃO (E2E-V) */}
       {receiptData && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-fade-in relative">
@@ -441,7 +661,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
               <img
                 src={receiptData.qrUrl}
                 alt="QR Code do Comprovante"
-                className="w-44 h-44 mx-auto rounded-lg bg-white p-2 mb-3 shadow-md"
+                className="w-40 h-40 mx-auto rounded-lg bg-white p-2 mb-3 shadow-md"
               />
 
               <div className="text-xs text-slate-400 uppercase tracking-wider mb-1 font-mono">
@@ -460,8 +680,8 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
               {copied && <span className="text-[10px] text-emerald-400 font-mono">Copiado para a área de transferência!</span>}
             </div>
 
-            {/* Explicação da Garantia das Premissas */}
-            <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 mb-4 text-xs text-slate-300 space-y-2">
+            {/* Garantias de Segurança */}
+            <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 mb-4 text-xs text-slate-300 space-y-1.5">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span>
@@ -471,7 +691,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Inclusão no Resultado:</strong> O hash <code className="text-emerald-300">{receiptData.hash.slice(0, 10)}...</code> é uma folha da Árvore de Merkle enviada para a Solana.
+                  <strong>Cédula Registrada:</strong> Hash <code className="text-emerald-300">{receiptData.hash.slice(0, 10)}...</code> adicionado à Árvore de Merkle.
                 </span>
               </div>
             </div>
@@ -490,7 +710,7 @@ export const UrnaTerminal: React.FC<UrnaTerminalProps> = ({
                 onClick={handleNextVoter}
                 className="btn-secondary w-full justify-center"
               >
-                <span>Concluir e Liberar Próximo Votante</span>
+                <span>Bloquear Cabine para Próximo Eleitor</span>
               </button>
             </div>
 
