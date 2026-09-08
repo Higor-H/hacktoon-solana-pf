@@ -396,8 +396,10 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
           {/* Campo de Busca de Recibo */}
           <form onSubmit={handleVerifyReceipt} className="flex flex-col sm:flex-row gap-3 pt-2">
             <div className="relative flex-1">
+              <label htmlFor="receipt-search" className="sr-only">Digite seu código de comprovante</label>
               <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
               <input
+                id="receipt-search"
                 type="text"
                 placeholder="Digite seu código de comprovante..."
                 value={receiptInput}

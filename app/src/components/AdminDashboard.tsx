@@ -359,10 +359,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </h3>
             <form onSubmit={handleAddCandidate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="cand-number" className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
                   Número (2 Dígitos) *
                 </label>
                 <input
+                  id="cand-number"
                   type="number"
                   required
                   placeholder="Ex: 40"
@@ -373,10 +374,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="cand-name" className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
                   Nome Completo *
                 </label>
                 <input
+                  id="cand-name"
                   type="text"
                   required
                   placeholder="Ex: Ana Paula Martins"
@@ -387,10 +389,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="cand-slate" className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
                   Chapa / Partido
                 </label>
                 <input
+                  id="cand-slate"
                   type="text"
                   placeholder="Ex: Chapa 4 - Renovação"
                   value={candSlate}
@@ -449,10 +452,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </h3>
             <form onSubmit={handleAddUrna} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="urna-id" className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
                   Identificador da Urna *
                 </label>
                 <input
+                  id="urna-id"
                   type="text"
                   required
                   placeholder="Ex: URNA-03"
@@ -463,10 +467,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="urna-name" className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
                   Nome Descritivo *
                 </label>
                 <input
+                  id="urna-name"
                   type="text"
                   required
                   placeholder="Ex: Urna 03 - Auditório"

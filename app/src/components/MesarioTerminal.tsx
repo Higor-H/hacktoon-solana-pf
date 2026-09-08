@@ -154,8 +154,10 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
       {/* Barra de Busca */}
       <div className="glass-panel p-4 mb-6">
         <div className="relative">
+          <label htmlFor="search-voter" className="sr-only">Buscar por Apartamento, Aluno, Matrícula ou Nome</label>
           <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
+            id="search-voter"
             type="text"
             placeholder="Buscar por Apartamento, Aluno, Matrícula ou Nome..."
             value={searchTerm}
@@ -285,10 +287,11 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
             </h3>
             <form onSubmit={handleAddVoter} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="voter-id" className="block text-xs font-mono text-slate-400 uppercase mb-1">
                   Identificador / Apartamento / Matrícula *
                 </label>
                 <input
+                  id="voter-id"
                   type="text"
                   required
                   placeholder="Ex: Apto 502 - Bloco C"
@@ -299,10 +302,11 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 uppercase mb-1">
+                <label htmlFor="voter-name" className="block text-xs font-mono text-slate-400 uppercase mb-1">
                   Nome do Eleitor (Opcional)
                 </label>
                 <input
+                  id="voter-name"
                   type="text"
                   placeholder="Ex: Roberto Carlos Pereira"
                   value={newName}
