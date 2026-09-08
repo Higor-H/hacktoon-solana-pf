@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "node --test src/test-crypto-flow.mjs",
+    "auditar": "node auditar-voto.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },

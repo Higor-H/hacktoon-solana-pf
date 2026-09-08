@@ -1,8 +1,52 @@
 import type { Election } from './types';
 import { generateUrnaKeypair } from './cryptoUtils';
+import nacl from 'tweetnacl';
+import bs58 from 'bs58';
+import { TARGET_WALLET_PUBKEY } from './solanaService';
+
+function getUrna1Keypair() {
+  if (typeof localStorage !== 'undefined') {
+    const fixedSecret = localStorage.getItem('urnasol_fixed_secret');
+    if (fixedSecret) {
+      try {
+        const secretBytes = bs58.decode(fixedSecret);
+        const pair = nacl.sign.keyPair.fromSecretKey(secretBytes);
+        return {
+          publicKey: bs58.encode(pair.publicKey),
+          secretKey: fixedSecret,
+          publicKeyBytes: pair.publicKey,
+          secretKeyBytes: secretBytes,
+        };
+      } catch {}
+    }
+
+    try {
+      const savedElec = localStorage.getItem('urnasol_election_data');
+      if (savedElec) {
+        const parsed = JSON.parse(savedElec);
+        const match = (parsed.urnas || []).find(
+          (u: { publicKey?: string; secretKey?: string }) =>
+            u.publicKey === TARGET_WALLET_PUBKEY && u.secretKey
+        );
+        if (match && match.secretKey) {
+          const secretBytes = bs58.decode(match.secretKey);
+          const pair = nacl.sign.keyPair.fromSecretKey(secretBytes);
+          localStorage.setItem('urnasol_fixed_secret', match.secretKey);
+          return {
+            publicKey: match.publicKey,
+            secretKey: match.secretKey,
+            publicKeyBytes: pair.publicKey,
+            secretKeyBytes: secretBytes,
+          };
+        }
+      }
+    } catch {}
+  }
+  return generateUrnaKeypair();
+}
 
 export function createDefaultElection(): Election {
-  const urna1Keys = generateUrnaKeypair();
+  const urna1Keys = getUrna1Keypair();
   const urna2Keys = generateUrnaKeypair();
 
   return {

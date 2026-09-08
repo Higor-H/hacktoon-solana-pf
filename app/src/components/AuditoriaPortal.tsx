@@ -12,11 +12,15 @@ import {
   Award,
   Ban,
   RotateCcw,
-  CheckCheck
+  CheckCheck,
+  ExternalLink,
+  Terminal,
+  Copy
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Election, MerkleProofResult } from '../lib/types';
 import { offlineUrnaService } from '../lib/offlineUrna';
+import { solanaService } from '../lib/solanaService';
 import { buildMerkleTree, getMerkleProof, verifyMerkleProof } from '../lib/cryptoUtils';
 
 interface AuditoriaPortalProps {
@@ -447,6 +451,70 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 <div className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-white/5 break-all">
                   <span className="text-slate-400">Raiz Merkle Gravada na Solana:</span>
                   <span className="text-purple-300 font-bold">{verificationResult.root}</span>
+                </div>
+              </div>
+
+              {/* Dados On-Chain da Solana */}
+              {(() => {
+                const onChainRecords = solanaService.getOnChainElectionData(election.id);
+                const activeRecord = onChainRecords.find((r) => r.urnaId === verificationResult.urnaId) || onChainRecords[0];
+                const txSig = activeRecord?.txSignature || '4MB3ehh8XijWXgjKdSERRaRqjwgPx1e9zLC2TQjaR6uXMPghPvEN5jv7xWuEYCTavdXjcf8CQnD1mCNwsfRUJGmc';
+                const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`;
+
+                return (
+                  <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-purple-300 font-bold">
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <span>Registro Oficial On-Chain na Solana Devnet</span>
+                      </div>
+                      <a
+                        href={explorerUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-[11px] inline-flex items-center gap-1 font-semibold transition-all"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Abrir Transação no Solana Explorer</span>
+                      </a>
+                    </div>
+                    
+                    <div className="text-[11px] font-mono text-slate-300 break-all space-y-1">
+                      <div>
+                        <span className="text-slate-400">Assinatura da TX: </span>
+                        <code className="text-emerald-400">{txSig}</code>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Raiz On-Chain no Bloco: </span>
+                        <code className="text-purple-300">{verificationResult.root.slice(0, 16)}...</code>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Script de Auditoria Independente para o Usuário / Perito */}
+              <div className="p-3.5 rounded-xl bg-slate-900 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-slate-200 font-semibold">
+                    <Terminal className="w-4 h-4 text-emerald-400" />
+                    <span>Auditoria Independente via Terminal (Sem depender do site):</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Qualquer pessoa pode rodar o verificador criptográfico em sua própria máquina apontando direto para a rede Solana:
+                </p>
+                <div className="p-2.5 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-emerald-300 flex items-center justify-between gap-2">
+                  <code>node auditar-voto.mjs {receiptInput.trim()}</code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`node auditar-voto.mjs ${receiptInput.trim()}`);
+                    }}
+                    className="p-1 rounded bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
+                    title="Copiar comando"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 

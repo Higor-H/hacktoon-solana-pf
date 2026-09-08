@@ -9,6 +9,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { createDefaultElection } from './lib/electionPresets';
 import type { Election } from './lib/types';
 import { offlineUrnaService } from './lib/offlineUrna';
+import { solanaService, TARGET_WALLET_PUBKEY } from './lib/solanaService';
 import { ShieldCheck, HardDrive, Cpu, Terminal } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -40,9 +41,17 @@ export const App: React.FC = () => {
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
   const [auditReceiptCode, setAuditReceiptCode] = useState<string>('');
 
-  // Persiste mudanças na eleição
+  // Persiste mudanças na eleição e sincroniza a carteira fixa
   useEffect(() => {
     localStorage.setItem('urnasol_election_data', JSON.stringify(election));
+
+    // Sincroniza a chave fixa caso esteja presente nas urnas da eleição
+    const targetUrna = (election.urnas || []).find((u) => u.publicKey === TARGET_WALLET_PUBKEY);
+    if (targetUrna && targetUrna.secretKey) {
+      localStorage.setItem('urnasol_fixed_secret', targetUrna.secretKey);
+      localStorage.setItem('urnasol_organizer_key', targetUrna.secretKey);
+      solanaService.ensurePreferredKey();
+    }
   }, [election]);
 
   // Urna selecionada ativa

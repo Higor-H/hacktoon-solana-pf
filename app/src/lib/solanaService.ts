@@ -31,25 +31,94 @@ export interface OnChainSubmissionResult {
   organizerPubkey: string;
 }
 
+export const TARGET_WALLET_PUBKEY = 'BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG';
+
+function resolveInitialKeypair(): Keypair {
+  if (typeof localStorage !== 'undefined') {
+    // 1. Verifica se já temos o segredo fixo registrado
+    const fixedSecret = localStorage.getItem('urnasol_fixed_secret');
+    if (fixedSecret) {
+      try {
+        const kp = Keypair.fromSecretKey(bs58.decode(fixedSecret));
+        if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
+          localStorage.setItem('urnasol_organizer_key', fixedSecret);
+          return kp;
+        }
+      } catch {}
+    }
+
+    // 2. Busca na eleição salva se a URNA-01 (ou outra) possui essa chave
+    try {
+      const savedElec = localStorage.getItem('urnasol_election_data');
+      if (savedElec) {
+        const parsed = JSON.parse(savedElec);
+        const match = (parsed.urnas || []).find(
+          (u: { publicKey?: string; secretKey?: string }) =>
+            u.publicKey === TARGET_WALLET_PUBKEY && u.secretKey
+        );
+        if (match && match.secretKey) {
+          const kp = Keypair.fromSecretKey(bs58.decode(match.secretKey));
+          localStorage.setItem('urnasol_fixed_secret', match.secretKey);
+          localStorage.setItem('urnasol_organizer_key', match.secretKey);
+          return kp;
+        }
+      }
+    } catch {}
+
+    // 3. Procura em todas as chaves do localStorage para encontrar o segredo da chave alvo
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k) {
+        const val = localStorage.getItem(k);
+        if (val && val.includes(TARGET_WALLET_PUBKEY)) {
+          try {
+            const parsed = JSON.parse(val);
+            if (parsed.secretKey) {
+              const kp = Keypair.fromSecretKey(bs58.decode(parsed.secretKey));
+              if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
+                localStorage.setItem('urnasol_fixed_secret', parsed.secretKey);
+                localStorage.setItem('urnasol_organizer_key', parsed.secretKey);
+                return kp;
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+
+    // 4. Se já havia uma chave qualquer em urnasol_organizer_key
+    const savedSecret = localStorage.getItem('urnasol_organizer_key');
+    if (savedSecret) {
+      try {
+        return Keypair.fromSecretKey(bs58.decode(savedSecret));
+      } catch {}
+    }
+  }
+
+  // 5. Fallback padrão: gera um novo
+  const gen = Keypair.generate();
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('urnasol_organizer_key', bs58.encode(gen.secretKey));
+  }
+  return gen;
+}
+
 export class SolanaService {
   private connection: Connection;
   private organizerKeypair: Keypair;
 
   constructor() {
     this.connection = new Connection(SOLANA_DEVNET_RPC, 'confirmed');
+    this.organizerKeypair = resolveInitialKeypair();
+  }
 
-    // Cria ou recupera uma chave de autoridade organizadora local para patrocinar as transações
-    const savedSecret = localStorage.getItem('urnasol_organizer_key');
-    if (savedSecret) {
-      try {
-        this.organizerKeypair = Keypair.fromSecretKey(bs58.decode(savedSecret));
-      } catch {
-        this.organizerKeypair = Keypair.generate();
-        localStorage.setItem('urnasol_organizer_key', bs58.encode(this.organizerKeypair.secretKey));
-      }
-    } else {
-      this.organizerKeypair = Keypair.generate();
-      localStorage.setItem('urnasol_organizer_key', bs58.encode(this.organizerKeypair.secretKey));
+  ensurePreferredKey(): void {
+    if (typeof localStorage === 'undefined') return;
+    if (this.organizerKeypair.publicKey.toBase58() === TARGET_WALLET_PUBKEY) return;
+
+    const kp = resolveInitialKeypair();
+    if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
+      this.organizerKeypair = kp;
     }
   }
 
