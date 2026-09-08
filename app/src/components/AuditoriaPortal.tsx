@@ -12,7 +12,6 @@ import {
   Award,
   Ban,
   RotateCcw,
-  CheckCheck,
   ExternalLink,
   Terminal,
   Copy
@@ -179,9 +178,9 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 VOTAÇÃO ENCERRADA (RESULTADO OFICIAL)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 animate-pulse">
-                <CheckCheck className="w-3.5 h-3.5" />
-                APURAÇÃO EM TEMPO REAL (VOTAÇÃO ABERTA)
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse">
+                <Lock className="w-3.5 h-3.5" />
+                VOTAÇÃO EM ANDAMENTO (APURAÇÃO LACRADA)
               </span>
             )}
           </div>
@@ -191,7 +190,7 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
           <p className="text-xs sm:text-sm text-slate-400">
             {isClosed
               ? 'A votação foi encerrada. Todos os votos foram totalizados e estão selados no Boletim de Urna.'
-              : 'Acompanhe a contagem de votos por candidato em tempo real e comprove a inclusão do seu voto.'}
+              : 'A votação está em andamento. Em conformidade com o sigilo eleitoral, os votos permanecem lacrados e só serão revelados após o encerramento oficial.'}
           </p>
         </div>
 
@@ -220,169 +219,235 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
       </div>
 
       {/* SEÇÃO 1: APURAÇÃO DOS VOTOS POR CANDIDATO (UNIVERSAL VERIFIABILITY) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Gráfico de Barras dos Candidatos */}
-        <div className="lg:col-span-8 glass-panel p-6 sm:p-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase">
-                <BarChart3 className="w-4 h-4" />
-                <span>Cargo: {election.roleTitle}</span>
-              </div>
-              <h3 className="text-xl font-bold text-white font-display mt-0.5">
-                Total de Votos por Candidato
-              </h3>
+      {!isClosed ? (
+        /* ESTADO LACRADO: Votação Aberta (Votos Ocultos) */
+        <div className="glass-panel p-8 sm:p-12 text-center space-y-6 border-amber-500/20 bg-gradient-to-b from-slate-900/90 to-slate-950/90 shadow-xl">
+          <div className="inline-flex p-4 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10">
+            <Lock className="w-12 h-12" />
+          </div>
+
+          <div className="max-w-xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Apuração Lacrada Durante o Pleito</span>
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-black text-white font-display">
-                {totalVotesAcrossUrnas}
+            <h3 className="text-2xl sm:text-3xl font-bold text-white font-display">
+              Votação em Andamento (Votos Ocultos)
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Para preservar a inviolabilidade do voto e a lisura do pleito eleitoral, <strong>os votos e resultados por candidato não são revelados enquanto a votação estiver aberta</strong>.
+            </p>
+            <p className="text-xs text-slate-400">
+              Cada voto está sendo registrado e embaralhado de forma anônima no Registro Digital do Voto (RDV) de cada urna, com raízes de Merkle autênticas. Os resultados finais serão revelados imediatamente após o encerramento oficial.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2 text-xs">
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Status da Seção</div>
+              <div className="text-base font-bold text-emerald-400 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>Votação Ativa</span>
               </div>
-              <div className="text-[11px] text-slate-400 font-mono">votos computados</div>
+              <div className="text-[11px] text-slate-500">Cabines coletando votos dos eleitores</div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Urnas Operando</div>
+              <div className="text-base font-bold text-white">
+                {election.urnas.length} {election.urnas.length === 1 ? 'Terminal Ativo' : 'Terminais Ativos'}
+              </div>
+              <div className="text-[11px] text-slate-500">Assinaturas Ed25519 em modo seguro</div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Sigilo Garantido</div>
+              <div className="text-base font-bold text-cyan-400 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4" />
+                <span>RDV Embaralhado</span>
+              </div>
+              <div className="text-[11px] text-slate-500">Apuração bloqueada até o fechamento</div>
             </div>
           </div>
 
-          {/* Candidato Mais Votado / Vencedor */}
-          {winner ? (
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-purple-950/30 to-slate-900 border border-emerald-500/40 flex items-center justify-between shadow-lg">
-              <div className="flex items-center gap-3">
-                <img
-                  src={winner.photoUrl}
-                  alt={winner.name}
-                  className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-400 shadow-md"
-                />
-                <div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase font-mono">
-                    <Award className="w-4 h-4" />
-                    <span>{isClosed ? 'ELEITO / VENCEDOR' : '1º LUGAR PARCIAL'}</span>
-                  </div>
-                  <div className="text-lg font-bold text-white font-display">
-                    {winner.name}
-                  </div>
-                  <div className="text-xs text-slate-300">
-                    Nº {winner.number} • {winner.partyOrSlate}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-3xl font-black text-emerald-400 font-mono">
-                  {winner.percentage}%
-                </div>
-                <div className="text-xs text-slate-400 font-mono">
-                  {winner.votes} votos
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-6 text-center text-slate-400 bg-slate-950/40 rounded-xl border border-white/5 font-mono text-xs">
-              Nenhum voto computado ainda. Vá na aba Cabine (Urna) para votar!
+          {onUpdateElection && (
+            <div className="pt-2">
+              <button
+                onClick={handleToggleCloseElection}
+                className="btn-primary py-3 px-6 text-sm font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
+              >
+                <Ban className="w-4 h-4" />
+                <span>Encerrar Votação Oficial para Liberar os Votos</span>
+              </button>
             </div>
           )}
-
-          {/* Lista de Barras de Progresso de Cada Candidato */}
-          <div className="space-y-4 pt-2">
-            {candidateTotals.map((c) => (
-              <div key={c.number} className="space-y-1.5 bg-slate-950/40 p-3 rounded-xl border border-white/5">
-                <div className="flex justify-between items-center text-xs sm:text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-black text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                      Nº {c.number}
-                    </span>
-                    <span className="font-bold text-white">{c.name}</span>
-                    <span className="text-[11px] text-slate-400 hidden sm:inline">({c.partyOrSlate})</span>
-                  </div>
-                  <div className="text-right font-mono">
-                    <strong className="text-white font-bold">{c.votes}</strong>
-                    <span className="text-slate-400 ml-1">votos ({c.percentage}%)</span>
-                  </div>
-                </div>
-                <div className="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden border border-white/5">
-                  <div
-                    className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 rounded-full transition-all duration-700"
-                    style={{ width: `${Math.max(parseFloat(c.percentage), totalVotesAcrossUrnas > 0 ? 3 : 0)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {/* Totais de Brancos e Nulos */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
-                <span className="text-slate-400">Votos em Branco:</span>
-                <span className="font-mono font-bold text-white">{blankVotesTotal}</span>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
-                <span className="text-slate-400">Votos Nulos:</span>
-                <span className="font-mono font-bold text-white">{nullVotesTotal}</span>
-              </div>
-            </div>
-          </div>
         </div>
-
-        {/* Auditoria das Urnas & Critérios */}
-        <div className="lg:col-span-4 space-y-6">
+      ) : (
+        /* ESTADO REVELADO: Votação Encerrada (Exibição dos Resultados) */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Status das Urnas */}
-          <div className="glass-panel p-6 space-y-4">
-            <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
-              <Layers className="w-4 h-4 text-purple-400" />
-              <span>Votos por Urna Registrada</span>
-            </h4>
+          {/* Gráfico de Barras dos Candidatos */}
+          <div className="lg:col-span-8 glass-panel p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Cargo: {election.roleTitle}</span>
+                </div>
+                <h3 className="text-xl font-bold text-white font-display mt-0.5">
+                  Total de Votos por Candidato
+                </h3>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-black text-white font-display">
+                  {totalVotesAcrossUrnas}
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono">votos computados</div>
+              </div>
+            </div>
 
-            <div className="space-y-2.5">
-              {election.urnas.map((u) => {
-                const votesInUrna = offlineUrnaService.getVotes(u.id).length;
-                return (
-                  <div
-                    key={u.id}
-                    className="p-3.5 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <div className="font-bold text-white">{u.id}</div>
-                      <div className="text-[11px] text-slate-400">{u.location}</div>
+            {/* Candidato Mais Votado / Vencedor */}
+            {winner ? (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-purple-950/30 to-slate-900 border border-emerald-500/40 flex items-center justify-between shadow-lg">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={winner.photoUrl}
+                    alt={winner.name}
+                    className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-400 shadow-md"
+                  />
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase font-mono">
+                      <Award className="w-4 h-4" />
+                      <span>ELEITO / VENCEDOR</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-mono font-bold text-emerald-400 text-sm">{votesInUrna}</span>
-                      <span className="text-[10px] text-slate-500 block">votos na urna</span>
+                    <div className="text-lg font-bold text-white font-display">
+                      {winner.name}
+                    </div>
+                    <div className="text-xs text-slate-300">
+                      Nº {winner.number} • {winner.partyOrSlate}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-black text-emerald-400 font-mono">
+                    {winner.percentage}%
+                  </div>
+                  <div className="text-xs text-slate-400 font-mono">
+                    {winner.votes} votos
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 text-center text-slate-400 bg-slate-950/40 rounded-xl border border-white/5 font-mono text-xs">
+                Nenhum voto computado nesta eleição.
+              </div>
+            )}
+
+            {/* Lista de Barras de Progresso de Cada Candidato */}
+            <div className="space-y-4 pt-2">
+              {candidateTotals.map((c) => (
+                <div key={c.number} className="space-y-1.5 bg-slate-950/40 p-3 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center text-xs sm:text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-black text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                        Nº {c.number}
+                      </span>
+                      <span className="font-bold text-white">{c.name}</span>
+                      <span className="text-[11px] text-slate-400 hidden sm:inline">({c.partyOrSlate})</span>
+                    </div>
+                    <div className="text-right font-mono">
+                      <strong className="text-white font-bold">{c.votes}</strong>
+                      <span className="text-slate-400 ml-1">votos ({c.percentage}%)</span>
+                    </div>
+                  </div>
+                  <div className="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 rounded-full transition-all duration-700"
+                      style={{ width: `${Math.max(parseFloat(c.percentage), totalVotesAcrossUrnas > 0 ? 3 : 0)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              {/* Totais de Brancos e Nulos */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Votos em Branco:</span>
+                  <span className="font-mono font-bold text-white">{blankVotesTotal}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Votos Nulos:</span>
+                  <span className="font-mono font-bold text-white">{nullVotesTotal}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Critérios de Integridade */}
-          <div className="glass-panel p-6 space-y-3.5">
-            <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
-              <FileCheck2 className="w-4 h-4 text-emerald-400" />
-              <span>Garantias Criptográficas</span>
-            </h4>
+          {/* Auditoria das Urnas & Critérios */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Status das Urnas */}
+            <div className="glass-panel p-6 space-y-4">
+              <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
+                <Layers className="w-4 h-4 text-purple-400" />
+                <span>Votos por Urna Registrada</span>
+              </h4>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="text-slate-300">
-                  <strong>Não-Duplicidade:</strong> Cada eleitor possui PIN único inutilizado no ato do voto.
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="text-slate-300">
-                  <strong>Voto Secreto:</strong> O RDV embaralha ordens aleatoriamente sem identificação pessoal.
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="text-slate-300">
-                  <strong>Merkle Root On-Chain:</strong> Raiz de comprovantes gravada na Solana.
-                </span>
+              <div className="space-y-2.5">
+                {election.urnas.map((u) => {
+                  const votesInUrna = offlineUrnaService.getVotes(u.id).length;
+                  return (
+                    <div
+                      key={u.id}
+                      className="p-3.5 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between text-xs"
+                    >
+                      <div>
+                        <div className="font-bold text-white">{u.id}</div>
+                        <div className="text-[11px] text-slate-400">{u.location}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-mono font-bold text-emerald-400 text-sm">{votesInUrna}</span>
+                        <span className="text-[10px] text-slate-500 block">votos na urna</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Critérios de Integridade */}
+            <div className="glass-panel p-6 space-y-3.5">
+              <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-emerald-400" />
+                <span>Garantias Criptográficas</span>
+              </h4>
+
+              <div className="space-y-3 text-xs">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-slate-300">
+                    <strong>Não-Duplicidade:</strong> Cada eleitor possui PIN único inutilizado no ato do voto.
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-slate-300">
+                    <strong>Voto Secreto:</strong> O RDV embaralha ordens aleatoriamente sem identificação pessoal.
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-slate-300">
+                    <strong>Merkle Root On-Chain:</strong> Raiz de comprovantes gravada na Solana.
+                  </span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
-
-      </div>
+      )}
 
       {/* SEÇÃO 2: VERIFICAÇÃO INDIVIDUAL DO COMPROVANTE (INDIVIDUAL E2E-V) */}
       <div className="glass-panel p-6 sm:p-8 border-emerald-500/30 bg-gradient-to-b from-emerald-950/20 to-slate-900/60">
@@ -427,10 +492,14 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 </div>
                 <div>
                   <h4 className="text-base font-bold font-display text-white">
-                    VOTO 100% COMPUTADO NO RESULTADO OFICIAL!
+                    {isClosed
+                      ? 'VOTO 100% COMPUTADO NO RESULTADO OFICIAL!'
+                      : 'COMPROVANTE VÁLIDO • CÉDULA REGISTRADA E LACRADA NO RDV!'}
                   </h4>
                   <p className="text-xs text-emerald-400 font-mono">
-                    Prova Matemática de Inclusão (Merkle Proof) Válida
+                    {isClosed
+                      ? 'Prova Matemática de Inclusão (Merkle Proof) Válida'
+                      : 'Prova Matemática Válida • O voto será totalizado no encerramento da eleição'}
                   </p>
                 </div>
               </div>

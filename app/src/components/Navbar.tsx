@@ -10,7 +10,8 @@ import {
   Volume2, 
   VolumeX,
   Ban,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 
 export type TabType = 'urna' | 'mesario' | 'bu' | 'auditoria' | 'admin';
@@ -111,6 +112,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <FileText className="w-4 h-4" />
               <span>Boletim (BU)</span>
+              {!isClosed && (
+                <Lock className="w-3 h-3 text-amber-400 opacity-80" />
+              )}
             </button>
 
             <button
@@ -123,6 +127,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Apuração & Auditoria</span>
+              {!isClosed && (
+                <Lock className="w-3 h-3 text-amber-400 opacity-80" />
+              )}
             </button>
 
             <button
@@ -208,15 +215,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('bu')}
-            className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'bu' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`px-3 py-1 rounded-md shrink-0 flex items-center gap-1 ${currentTab === 'bu' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
           >
-            Boletim (BU)
+            <span>Boletim (BU)</span>
+            {!isClosed && <Lock className="w-2.5 h-2.5 text-amber-400" />}
           </button>
           <button
             onClick={() => setCurrentTab('auditoria')}
-            className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'auditoria' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`px-3 py-1 rounded-md shrink-0 flex items-center gap-1 ${currentTab === 'auditoria' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
           >
-            Apuração
+            <span>Apuração</span>
+            {!isClosed && <Lock className="w-2.5 h-2.5 text-amber-400" />}
           </button>
           <button
             onClick={() => setCurrentTab('admin')}

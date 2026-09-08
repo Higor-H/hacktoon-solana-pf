@@ -74,8 +74,13 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
 
   // Carrega ou gera o BU da urna selecionada
   useEffect(() => {
-    loadOrGenerateBU();
-  }, [selectedUrna.id]);
+    if (isClosed) {
+      loadOrGenerateBU();
+    } else {
+      setBuPayload(null);
+      setQrCodeUrl('');
+    }
+  }, [selectedUrna.id, isClosed]);
 
   const loadOrGenerateBU = async () => {
     let bu = offlineUrnaService.getSavedBU(selectedUrna.id);
@@ -175,7 +180,9 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
             Boletim de Urna (BU) Digital & Assinado
           </h1>
           <p className="text-sm text-slate-400">
-            Relatório oficial emitido após o término da votação, assinado com Ed25519 e exportável para a Solana.
+            {isClosed
+              ? 'Relatório oficial emitido após o término da votação, assinado com Ed25519 e exportável para a Solana.'
+              : 'O Boletim de Urna com a contagem de votos só é emitido após o encerramento oficial da eleição.'}
           </p>
         </div>
 
@@ -183,32 +190,96 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
           {!isClosed && onUpdateElection && (
             <button
               onClick={handleCloseElection}
-              className="btn-primary text-xs bg-red-600 hover:bg-red-500 text-white"
+              className="btn-primary text-xs bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
             >
               <Ban className="w-4 h-4" />
               <span>Encerrar Votação Oficial</span>
             </button>
           )}
 
-          <button
-            onClick={loadOrGenerateBU}
-            className="btn-secondary text-xs"
-            title="Recalcular apuração com novos votos"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Recalcular BU</span>
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="btn-secondary text-xs"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Imprimir BU</span>
-          </button>
+          {isClosed && (
+            <>
+              <button
+                onClick={loadOrGenerateBU}
+                className="btn-secondary text-xs"
+                title="Recalcular apuração com novos votos"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>Recalcular BU</span>
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="btn-secondary text-xs"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Imprimir BU</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Banner de Status de Transmissão para a Solana */}
+      {!isClosed ? (
+        /* ESTADO BLOQUEADO DO BOLETIM DE URNA ENQUANTO A VOTAÇÃO ESTIVER ABERTA */
+        <div className="glass-panel p-8 sm:p-12 text-center space-y-6 border-amber-500/20 bg-gradient-to-b from-slate-900/90 to-slate-950/90 shadow-xl">
+          <div className="inline-flex p-4 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10">
+            <Lock className="w-12 h-12" />
+          </div>
+
+          <div className="max-w-xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Boletim Bloqueado • Votação em Aberto</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-bold text-white font-display">
+              Boletim de Urna (BU) Indisponível
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              O Boletim de Urna (BU) com a totalização de votos desta seção <strong>não pode ser emitido ou visualizado enquanto a votação estiver em andamento</strong>, protegendo o sigilo e a lisura do pleito.
+            </p>
+            <p className="text-xs text-slate-400">
+              Conforme as normas da Justiça Eleitoral, a urna eletrônica só consolida e assina o BU após o encerramento oficial da seção. Encerre a eleição para emitir o relatório impresso e exportá-lo para a rede Solana.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2 text-xs">
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Seção / Urna</div>
+              <div className="text-base font-bold text-white font-mono">{selectedUrna.id}</div>
+              <div className="text-[11px] text-slate-500">{selectedUrna.name}</div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Local de Votação</div>
+              <div className="text-sm font-bold text-slate-200">{selectedUrna.location}</div>
+              <div className="text-[11px] text-slate-500">Cabine física em operação segura</div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
+              <div className="text-[11px] font-mono text-slate-400 uppercase">Status do Relatório</div>
+              <div className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Lacrado no RDV</span>
+              </div>
+              <div className="text-[11px] text-slate-500">Aguardando encerramento</div>
+            </div>
+          </div>
+
+          {onUpdateElection && (
+            <div className="pt-2">
+              <button
+                onClick={handleCloseElection}
+                className="btn-primary py-3 px-6 text-sm font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
+              >
+                <Ban className="w-4 h-4" />
+                <span>Encerrar Votação Oficial para Emitir o BU</span>
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Banner de Status de Transmissão para a Solana */}
       {submissionResult ? (
         <div className="glass-panel p-5 border-emerald-500/50 bg-emerald-950/20 animate-fade-in space-y-3">
           <div className="flex items-start gap-4">
@@ -615,6 +686,8 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
         </div>
 
       </div>
+        </>
+      )}
 
     </div>
   );
