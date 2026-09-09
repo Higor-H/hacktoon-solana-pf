@@ -194,32 +194,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   return (
     <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-6">
 
-      {/* Cabeçalho em Ilha */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
+      {/* Cabeçalho Editorial */}
+      <div className="serif-card p-6 sm:p-8 rounded-xl border border-[#E8E4DF] border-t-2 border-t-[#B8860B] bg-white shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold tracking-wider text-emerald-400 uppercase">
+          <div className="flex items-center gap-2 mb-2 text-xs font-mono font-semibold tracking-widest text-[#B8860B] uppercase">
             <Settings className="w-4 h-4" />
-            <span>CONFIGURAÇÃO DO PLEITO</span>
+            <span>Configuração do Pleito Oficial</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            PAINEL ADMINISTRATIVO
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#1A1A1A] tracking-tight">
+            Painel Administrativo
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Gerencie candidatos, urnas físicas, pacotes de carga e parâmetros da eleição.
+          <p className="text-sm text-[#6B6B6B] mt-1 font-sans">
+            Gerencie candidatos, urnas físicas credenciadas, pacotes criptográficos de carga e parâmetros eleitorais.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2.5">
-          <button onClick={handleDownloadCargaPackage} className="island-btn-primary rounded-xl text-xs">
-            <Download className="w-3.5 h-3.5" />
+        <div className="flex flex-wrap gap-3">
+          <button onClick={handleDownloadCargaPackage} className="serif-btn-primary rounded-lg text-xs px-4 py-2.5">
+            <Download className="w-4 h-4" />
             <span>EXPORTAR CARGA</span>
           </button>
           <button
             onClick={handleResetDemoVotes}
-            className="island-btn rounded-xl text-xs text-red-400 hover:text-red-300 hover:border-red-500/30 hover:bg-red-500/10"
+            className="serif-btn-outline rounded-lg text-xs px-4 py-2.5 text-red-700 border-red-200 hover:bg-red-50 hover:border-red-300"
             title="Limpar votos para reiniciar demonstração"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-4 h-4 text-red-600" />
             <span>RESET DEMO</span>
           </button>
         </div>
@@ -227,40 +227,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Alerta de Feedback */}
       {successNotice && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-300 flex items-center gap-2 animate-fade-in shadow-sm">
-          <CheckCircle className="w-4 h-4 text-emerald-400" />
-          <span>{successNotice}</span>
+        <div className="p-4 rounded-lg bg-[#FAF8F5] border border-[#B8860B]/40 text-xs font-mono text-[#1A1A1A] flex items-center gap-2.5 shadow-xs animate-fade-in">
+          <CheckCircle className="w-4 h-4 text-[#B8860B] shrink-0" />
+          <span className="font-semibold">{successNotice}</span>
         </div>
       )}
 
-      {/* Seletor de Abas em Formato Pill */}
-      <div className="flex gap-2 border-b border-zinc-800 pb-3">
+      {/* Seletor de Abas Editorial */}
+      <div className="flex gap-2 border-b border-[#E8E4DF] pb-3">
         <button
           onClick={() => setActiveTab('geral')}
-          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
+          className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all ${
             activeTab === 'geral'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
-              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+              ? 'bg-[#1A1A1A] text-white shadow-xs'
+              : 'text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F5F3F0] border border-transparent'
           }`}
         >
           PARÂMETROS
         </button>
         <button
           onClick={() => setActiveTab('candidatos')}
-          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
+          className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all ${
             activeTab === 'candidatos'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
-              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+              ? 'bg-[#1A1A1A] text-white shadow-xs'
+              : 'text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F5F3F0] border border-transparent'
           }`}
         >
           CANDIDATOS ({election.candidates.length})
         </button>
         <button
           onClick={() => setActiveTab('urnas')}
-          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
+          className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all ${
             activeTab === 'urnas'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
-              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+              ? 'bg-[#1A1A1A] text-white shadow-xs'
+              : 'text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F5F3F0] border border-transparent'
           }`}
         >
           URNAS ({election.urnas.length})
@@ -271,73 +271,77 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeTab === 'geral' && (
         <div className="space-y-6">
 
-          {/* Predefinições em Ilha */}
-          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-1">
-              MODELOS PRONTOS PARA APRESENTAÇÃO
+          {/* Predefinições em Cartões Editoriais */}
+          <div className="serif-card p-6 sm:p-8 rounded-xl border border-[#E8E4DF] bg-white shadow-xs">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#B8860B] mb-1">
+              MODELOS PRONTOS PARA DEMONSTRAÇÃO
             </h3>
-            <p className="text-xs text-zinc-400 mb-5">
+            <p className="text-sm text-[#6B6B6B] mb-6 font-sans">
               Alterne rapidamente entre cenários práticos com candidatos e eleitores pré-configurados:
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <button
                 onClick={handlePresetCondo}
-                className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all text-left group shadow-md"
+                className="p-6 rounded-xl bg-[#FAF8F5] border border-[#E8E4DF] hover:border-[#B8860B] hover:shadow-sm transition-all text-left group"
               >
-                <div className="flex items-center gap-3.5 mb-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-11 h-11 rounded-lg bg-white border border-[#E8E4DF] flex items-center justify-center text-[#B8860B] group-hover:scale-105 transition-transform shadow-xs">
                     <Building className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">ELEIÇÃO DE CONDOMÍNIO</h4>
-                    <span className="text-xs text-zinc-400 font-mono">SÍNDICO GERAL & MORADORES</span>
+                    <h4 className="text-base font-serif font-bold text-[#1A1A1A] group-hover:text-[#B8860B] transition-colors">
+                      Eleição de Condomínio
+                    </h4>
+                    <span className="text-xs text-[#6B6B6B] font-mono">Síndico Geral & Moradores</span>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  Eleitores organizados por número de apartamento e bloco residencial.
+                <p className="text-xs text-[#6B6B6B] leading-relaxed font-sans">
+                  Eleitores organizados por número de apartamento e bloco residencial com credenciais individuais.
                 </p>
               </button>
 
               <button
                 onClick={handlePresetSchool}
-                className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all text-left group shadow-md"
+                className="p-6 rounded-xl bg-[#FAF8F5] border border-[#E8E4DF] hover:border-[#B8860B] hover:shadow-sm transition-all text-left group"
               >
-                <div className="flex items-center gap-3.5 mb-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-11 h-11 rounded-lg bg-white border border-[#E8E4DF] flex items-center justify-center text-[#B8860B] group-hover:scale-105 transition-transform shadow-xs">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">ELEIÇÃO ESCOLAR / GRÊMIO</h4>
-                    <span className="text-xs text-zinc-400 font-mono">DIRETOR & REPRESENTANTES</span>
+                    <h4 className="text-base font-serif font-bold text-[#1A1A1A] group-hover:text-[#B8860B] transition-colors">
+                      Eleição Escolar / Grêmio
+                    </h4>
+                    <span className="text-xs text-[#6B6B6B] font-mono">Diretoria & Representantes</span>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  Eleitores cadastrados por matrícula estudantil e turmas ativas.
+                <p className="text-xs text-[#6B6B6B] leading-relaxed font-sans">
+                  Eleitores cadastrados por matrícula estudantil e turmas ativas da comunidade escolar.
                 </p>
               </button>
             </div>
           </div>
 
-          {/* Dados On-Chain em Ilha */}
-          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
-            <h3 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+          {/* Dados On-Chain */}
+          <div className="serif-card p-6 sm:p-8 rounded-xl border border-[#E8E4DF] bg-white shadow-xs space-y-4">
+            <h3 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#B8860B]">
               <Key className="w-4 h-4" />
-              <span>CONTAS PDA ON-CHAIN NA SOLANA</span>
+              <span>Contas PDA On-Chain na Solana</span>
             </h3>
 
-            <div className="space-y-2 text-xs font-mono text-zinc-400">
-              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-zinc-800/80">
-                <span>PROGRAM ID (ANCHOR):</span>
-                <span className="text-white font-bold">{election.solanaProgramId}</span>
+            <div className="space-y-3 text-xs font-mono text-[#6B6B6B]">
+              <div className="flex flex-col sm:flex-row sm:justify-between py-2.5 border-b border-[#E8E4DF]">
+                <span className="text-[#1A1A1A] font-medium">PROGRAM ID (ANCHOR):</span>
+                <span className="text-[#1A1A1A] font-bold break-all">{election.solanaProgramId}</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-zinc-800/80">
-                <span>ID DA ELEIÇÃO (SEED):</span>
-                <span className="text-white font-bold">{election.id}</span>
+              <div className="flex flex-col sm:flex-row sm:justify-between py-2.5 border-b border-[#E8E4DF]">
+                <span className="text-[#1A1A1A] font-medium">ID DA ELEIÇÃO (SEED):</span>
+                <span className="text-[#1A1A1A] font-bold">{election.id}</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between py-2">
-                <span>CLUSTER ALVO:</span>
-                <span className="text-emerald-400 font-bold">SOLANA DEVNET (CONFIRMED)</span>
+              <div className="flex flex-col sm:flex-row sm:justify-between py-2.5">
+                <span className="text-[#1A1A1A] font-medium">CLUSTER ALVO:</span>
+                <span className="text-[#B8860B] font-bold">SOLANA DEVNET (CONFIRMED)</span>
               </div>
             </div>
           </div>
@@ -349,14 +353,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeTab === 'candidatos' && (
         <div className="space-y-6">
 
-          {/* Formulário de Novo Candidato em Ilha */}
-          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-4">
+          {/* Formulário de Novo Candidato */}
+          <div className="serif-card p-6 sm:p-8 rounded-xl border border-[#E8E4DF] bg-white shadow-xs">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#B8860B] mb-4">
               CADASTRAR NOVO CANDIDATO
             </h3>
-            <form onSubmit={handleAddCandidate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <form onSubmit={handleAddCandidate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block text-xs font-mono uppercase text-[#6B6B6B] mb-1.5 font-medium">
                   NÚMERO (2 DIG.) *
                 </label>
                 <input
@@ -365,12 +369,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: 40"
                   value={candNumber}
                   onChange={(e) => setCandNumber(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block text-xs font-mono uppercase text-[#6B6B6B] mb-1.5 font-medium">
                   NOME COMPLETO *
                 </label>
                 <input
@@ -379,12 +383,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: Ana Paula Martins"
                   value={candName}
                   onChange={(e) => setCandName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block text-xs font-mono uppercase text-[#6B6B6B] mb-1.5 font-medium">
                   CHAPA / PARTIDO
                 </label>
                 <input
@@ -392,12 +396,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: Chapa 4 - Renovação"
                   value={candSlate}
                   onChange={(e) => setCandSlate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono"
                 />
               </div>
 
               <div className="flex items-end">
-                <button type="submit" className="island-btn-primary rounded-xl w-full h-[38px] text-xs">
+                <button type="submit" className="serif-btn-primary rounded-lg w-full h-[40px] text-xs">
                   <Plus className="w-4 h-4" />
                   <span>ADICIONAR</span>
                 </button>
@@ -405,26 +409,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </form>
           </div>
 
-          {/* Lista de Candidatos em Ilhas */}
+          {/* Lista de Candidatos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {election.candidates.map((c) => (
               <div
                 key={c.number}
-                className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex gap-4 items-center shadow-lg hover:border-zinc-700 transition-all"
+                className="serif-card p-5 rounded-xl border border-[#E8E4DF] bg-white flex gap-4 items-center shadow-xs hover:border-[#B8860B] transition-all"
               >
                 <img
                   src={c.photoUrl}
                   alt={c.name}
-                  className="w-16 h-16 rounded-2xl object-cover border border-zinc-700 shadow-md shrink-0"
+                  className="w-16 h-16 rounded-xl object-cover border border-[#E8E4DF] shadow-xs shrink-0"
                 />
                 <div>
-                  <div className="text-xl font-black text-emerald-400 font-mono">
+                  <div className="text-xl font-mono font-bold text-[#B8860B]">
                     Nº {c.number}
                   </div>
-                  <div className="text-sm font-bold text-white tracking-tight">
+                  <div className="text-base font-serif font-bold text-[#1A1A1A] tracking-tight">
                     {c.name}
                   </div>
-                  <div className="text-xs text-zinc-400 font-mono mt-0.5">
+                  <div className="text-xs text-[#6B6B6B] font-mono mt-0.5">
                     {c.partyOrSlate}
                   </div>
                 </div>
@@ -439,14 +443,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeTab === 'urnas' && (
         <div className="space-y-6">
 
-          {/* Formulário de Credenciamento de Nova Urna em Ilha */}
-          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-4">
+          {/* Formulário de Credenciamento de Nova Urna */}
+          <div className="serif-card p-6 sm:p-8 rounded-xl border border-[#E8E4DF] bg-white shadow-xs">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#B8860B] mb-4">
               CREDENCIAR NOVA URNA FÍSICA (ED25519)
             </h3>
-            <form onSubmit={handleAddUrna} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <form onSubmit={handleAddUrna} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block text-xs font-mono uppercase text-[#6B6B6B] mb-1.5 font-medium">
                   IDENTIFICADOR *
                 </label>
                 <input
@@ -455,12 +459,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: URNA-03"
                   value={urnaIdInput}
                   onChange={(e) => setUrnaIdInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono uppercase focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono uppercase"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block text-xs font-mono uppercase text-[#6B6B6B] mb-1.5 font-medium">
                   NOME DESCRITIVO *
                 </label>
                 <input
@@ -469,12 +473,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: Urna 03 - Auditório"
                   value={urnaNameInput}
                   onChange={(e) => setUrnaNameInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono"
                 />
               </div>
 
               <div className="flex items-end">
-                <button type="submit" className="island-btn-primary rounded-xl w-full h-[38px] text-xs">
+                <button type="submit" className="serif-btn-primary rounded-lg w-full h-[40px] text-xs">
                   <Plus className="w-4 h-4" />
                   <span>GERAR & CREDENCIAR</span>
                 </button>
@@ -482,33 +486,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </form>
           </div>
 
-          {/* Lista de Urnas Credenciadas em Ilhas */}
+          {/* Lista de Urnas Credenciadas */}
           <div className="space-y-3">
             {election.urnas.map((u) => (
               <div
                 key={u.id}
-                className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg hover:border-zinc-700 transition-all text-xs font-mono"
+                className="serif-card p-5 rounded-xl border border-[#E8E4DF] bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs hover:border-[#B8860B] transition-all text-xs font-mono"
               >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-inner shrink-0">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#FAF8F5] border border-[#E8E4DF] flex items-center justify-center text-[#B8860B] shrink-0 shadow-xs">
                     <HardDrive className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-white text-sm">{u.name}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                      <span className="font-serif font-bold text-[#1A1A1A] text-base">{u.name}</span>
+                      <span className="px-2 py-0.5 rounded text-xs font-mono font-semibold bg-[#FAF8F5] border border-[#E8E4DF] text-[#1A1A1A]">
                         {u.id}
                       </span>
                     </div>
-                    <div className="text-zinc-400 text-xs">LOCAL: {u.location}</div>
-                    <div className="text-zinc-500 text-[11px] mt-0.5 break-all">
+                    <div className="text-[#6B6B6B] text-xs font-sans">LOCALIZAÇÃO: {u.location}</div>
+                    <div className="text-[#6B6B6B]/80 text-[11px] mt-0.5 break-all font-mono">
                       ED25519: {u.publicKey}
                     </div>
                   </div>
                 </div>
 
                 <div className="self-end sm:self-center shrink-0">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono font-medium bg-[#FAF8F5] border border-[#B8860B]/40 text-[#B8860B]">
                     AUTORIZADA ON-CHAIN
                   </span>
                 </div>

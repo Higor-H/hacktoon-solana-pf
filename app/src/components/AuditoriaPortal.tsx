@@ -6,7 +6,6 @@ import {
   XCircle, 
   Sparkles, 
   Layers, 
-  BarChart3, 
   FileCheck2,
   Lock,
   Award,
@@ -111,7 +110,6 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
 
     const cleanInput = receiptInput.trim().toUpperCase();
 
-    // Procura o comprovante nas urnas da eleição
     let found = false;
 
     for (const urna of election.urnas) {
@@ -133,7 +131,7 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
             particleCount: 120,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#14F195', '#9945FF', '#00C2FF'],
+            colors: ['#B8860B', '#D4A84B', '#166534'],
           });
         }
 
@@ -160,45 +158,45 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-6">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 space-y-6">
 
-      {/* Cabeçalho com Status e Botão de Encerramento em Ilha */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
+      {/* Cabeçalho Editorial com Status */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-md bg-white border border-[#E8E4DF] border-t-2 border-t-[#B8860B] shadow-sm">
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono font-semibold tracking-[0.08em] bg-[#FAFAF8] border border-[#E8E4DF] text-[#B8860B]">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>AUDITORIA FIM-A-FIM (E2E-V)</span>
             </span>
             {isClosed ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-red-500/10 border border-red-500/30 text-red-400">
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono font-semibold tracking-[0.08em] bg-[#991B1B]/10 border border-[#991B1B]/20 text-[#991B1B]">
                 <Ban className="w-3.5 h-3.5" />
                 VOTAÇÃO ENCERRADA (RESULTADO OFICIAL)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400">
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono font-semibold tracking-[0.08em] bg-[#B45309]/10 border border-[#B45309]/20 text-[#B45309]">
                 <Lock className="w-3.5 h-3.5" />
                 VOTAÇÃO EM ANDAMENTO (APURAÇÃO LACRADA)
               </span>
             )}
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            {isClosed ? 'RESULTADO OFICIAL HOMOLOGADO' : 'APURAÇÃO & TRANSPARÊNCIA ELEITORAL'}
+          <h1 className="font-serif font-bold text-2xl text-[#1A1A1A] tracking-tight">
+            {isClosed ? 'Resultado Oficial Homologado' : 'Apuração & Transparência Eleitoral'}
           </h1>
-          <p className="text-xs text-zinc-400 mt-1 max-w-xl">
+          <p className="text-xs text-[#6B6B6B] mt-1 max-w-xl font-sans">
             {isClosed
-              ? 'A votação foi encerrada. Todos os votos foram totalizados e estão selados no Boletim de Urna.'
-              : 'Votação em andamento. Conforme o princípio de sigilo do voto, os votos permanecem lacrados até o término oficial.'}
+              ? 'A votação foi concluída. Todos os votos foram totalizados e estão selados no Boletim de Urna com prova na Solana.'
+              : 'Votação em andamento. Em conformidade com o princípio de sigilo, os votos permanecem lacrados até o término oficial.'}
           </p>
         </div>
 
         {onUpdateElection && (
           <button
             onClick={handleToggleCloseElection}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-semibold transition-all shrink-0 ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-mono font-medium tracking-[0.05em] uppercase transition-all shrink-0 ${
               isClosed
-                ? 'island-btn'
-                : 'bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25 shadow-md shadow-red-500/20'
+                ? 'serif-btn-outline'
+                : 'bg-[#991B1B]/10 border border-[#991B1B]/30 text-[#991B1B] hover:bg-[#991B1B]/20'
             }`}
           >
             {isClosed ? (
@@ -219,55 +217,55 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
       {/* SEÇÃO 1: APURAÇÃO DOS VOTOS */}
       {!isClosed ? (
         /* ESTADO LACRADO DURANTE A ELEIÇÃO (Regra de Sigilo) */
-        <div className="p-8 sm:p-12 rounded-3xl bg-zinc-950/70 border border-amber-500/30 backdrop-blur-md text-center space-y-6 shadow-2xl">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+        <div className="p-8 sm:p-12 rounded-lg bg-white border border-[#E8E4DF] border-t-4 border-t-[#B45309] text-center space-y-6 shadow-sm">
+          <div className="w-16 h-16 mx-auto rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#B45309] shadow-sm">
             <Lock className="w-8 h-8" />
           </div>
 
           <div className="max-w-xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold tracking-[0.08em] bg-[#B45309]/10 text-[#B45309] border border-[#B45309]/20">
               <Lock className="w-3.5 h-3.5" />
               <span>APURAÇÃO LACRADA DURANTE O PLEITO</span>
             </div>
             
-            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              VOTAÇÃO EM ANDAMENTO (VOTOS OCULTOS)
+            <h3 className="font-serif font-bold text-2xl text-[#1A1A1A] tracking-tight">
+              Votação em Andamento (Votos Ocultos)
             </h3>
             
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] leading-relaxed font-sans">
               Para preservar a inviolabilidade do voto e a lisura do pleito,{' '}
-              <strong className="text-white">os votos e resultados por candidato não são revelados enquanto a votação estiver aberta</strong>.
+              <strong className="text-[#1A1A1A]">os votos e resultados por candidato não são revelados enquanto a votação estiver aberta</strong>.
             </p>
-            <p className="text-xs text-zinc-500 font-mono">
-              Cada cédula é registrada anonimamente no RDV de cada urna. Os totais serão revelados após o encerramento oficial.
+            <p className="text-xs text-[#8C8883] font-mono">
+              Cada cédula é gravada anonimamente no RDV de cada urna. Os totais serão revelados após o encerramento oficial.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2">
-            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">STATUS DA SEÇÃO</div>
-              <div className="flex items-center gap-2 text-sm font-bold font-mono text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-1">
+              <div className="small-caps text-[#6B6B6B]">STATUS DA SEÇÃO</div>
+              <div className="flex items-center gap-2 text-sm font-bold font-mono text-[#166534]">
+                <span className="w-2 h-2 rounded-full bg-[#166534]" />
                 <span>VOTAÇÃO ATIVA</span>
               </div>
-              <div className="text-[11px] text-zinc-500 font-mono">Cabines coletando votos</div>
+              <div className="text-[11px] text-[#8C8883] font-mono">Cabines coletando votos</div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">URNAS OPERANDO</div>
-              <div className="text-sm font-bold font-mono text-white">
+            <div className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-1">
+              <div className="small-caps text-[#6B6B6B]">URNAS OPERANDO</div>
+              <div className="text-sm font-bold font-mono text-[#1A1A1A]">
                 {election.urnas.length} {election.urnas.length === 1 ? 'TERMINAL ATIVO' : 'TERMINAIS ATIVOS'}
               </div>
-              <div className="text-[11px] text-zinc-500 font-mono">Assinaturas Ed25519</div>
+              <div className="text-[11px] text-[#8C8883] font-mono">Assinaturas Ed25519</div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">SIGILO GARANTIDO</div>
-              <div className="flex items-center gap-1.5 text-sm font-bold font-mono text-emerald-400">
+            <div className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-1">
+              <div className="small-caps text-[#6B6B6B]">SIGILO GARANTIDO</div>
+              <div className="flex items-center gap-1.5 text-sm font-bold font-mono text-[#166534]">
                 <ShieldCheck className="w-4 h-4" />
                 <span>RDV EMBARALHADO</span>
               </div>
-              <div className="text-[11px] text-zinc-500 font-mono">Bloqueado até o fechamento</div>
+              <div className="text-[11px] text-[#8C8883] font-mono">Bloqueado até o fechamento</div>
             </div>
           </div>
 
@@ -275,7 +273,7 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
             <div className="pt-3">
               <button
                 onClick={handleToggleCloseElection}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25 shadow-lg shadow-red-500/20 transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-xs font-mono font-medium tracking-[0.05em] uppercase bg-[#991B1B] text-white hover:bg-[#7F1D1D] shadow-sm transition-all"
               >
                 <Ban className="w-4 h-4" />
                 <span>ENCERRAR VOTAÇÃO OFICIAL PARA LIBERAR OS VOTOS</span>
@@ -285,90 +283,89 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
         </div>
       ) : (
         /* ESTADO REVELADO (HOMOLOGADO) */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          {/* Gráfico de Barras dos Candidatos em Ilha */}
-          <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+          {/* Gráfico de Barras dos Candidatos */}
+          <div className="lg:col-span-8 p-6 sm:p-8 rounded-md bg-white border border-[#E8E4DF] border-t-2 border-t-[#B8860B] shadow-sm space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E8E4DF]">
               <div>
-                <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase tracking-wider">
-                  <BarChart3 className="w-4 h-4" />
-                  <span>CARGO: {election.roleTitle}</span>
+                <div className="small-caps text-[#B8860B]">
+                  CARGO: {election.roleTitle}
                 </div>
-                <h3 className="text-base font-bold text-white tracking-tight mt-1">
-                  TOTAL DE VOTOS POR CANDIDATO
+                <h3 className="font-serif font-bold text-lg text-[#1A1A1A] mt-1">
+                  Total de Votos por Candidato
                 </h3>
               </div>
               <div className="text-right">
-                <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+                <div className="font-serif text-3xl font-bold text-[#1A1A1A]">
                   {totalVotesAcrossUrnas}
                 </div>
-                <div className="text-[11px] text-zinc-400 font-mono">VOTOS COMPUTADOS</div>
+                <div className="small-caps text-[#6B6B6B]">VOTOS COMPUTADOS</div>
               </div>
             </div>
 
-            {/* Candidato Vencedor em Ilha com Destaque */}
+            {/* Candidato Vencedor com Destaque Editorial */}
             {winner ? (
-              <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-emerald-500/10">
+              <div className="p-5 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] border-l-4 border-l-[#B8860B] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center gap-4">
                   <img
                     src={winner.photoUrl}
                     alt={winner.name}
-                    className="w-16 h-16 rounded-2xl object-cover border border-emerald-500/40 shadow-md"
+                    className="w-16 h-16 rounded-md object-cover border border-[#E8E4DF] shadow-sm"
                   />
                   <div>
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider mb-1">
+                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#B8860B] uppercase tracking-[0.1em] mb-1">
                       <Award className="w-4 h-4" />
                       <span>ELEITO / VENCEDOR</span>
                     </div>
-                    <div className="font-extrabold text-lg text-white">
+                    <div className="font-serif font-bold text-xl text-[#1A1A1A]">
                       {winner.name}
                     </div>
-                    <div className="text-xs text-zinc-400 font-mono mt-0.5">
+                    <div className="text-xs text-[#6B6B6B] font-mono mt-0.5">
                       Nº {winner.number} • {winner.partyOrSlate}
                     </div>
                   </div>
                 </div>
                 <div className="text-right sm:text-right w-full sm:w-auto">
-                  <div className="text-3xl font-black text-emerald-400 font-mono">
+                  <div className="font-serif text-3xl font-bold text-[#B8860B]">
                     {winner.percentage}%
                   </div>
-                  <div className="text-xs text-zinc-400 font-mono">{winner.votes} VOTOS</div>
+                  <div className="text-xs text-[#6B6B6B] font-mono">{winner.votes} VOTOS</div>
                 </div>
               </div>
             ) : (
-              <div className="p-6 rounded-xl bg-zinc-900/60 border border-zinc-800 text-center font-mono text-xs text-zinc-400">
+              <div className="p-6 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] text-center font-mono text-xs text-[#6B6B6B]">
                 NENHUM VOTO COMPUTADO NESTA ELEIÇÃO.
               </div>
             )}
 
-            {/* Barras de Progresso Arredondadas */}
+            {/* Barras de Progresso Refinadas com Dourado */}
             <div className="space-y-3 pt-2">
               {candidateTotals.map((c) => (
                 <div
                   key={c.number}
-                  className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/80 space-y-2 hover:border-zinc-700 transition-all"
+                  className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-2 hover:border-[#B8860B]/40 transition-all"
                 >
                   <div className="flex justify-between items-center text-xs font-mono">
                     <div className="flex items-center gap-2.5">
-                      <span className="font-bold text-zinc-900 bg-emerald-400 px-2 py-0.5 rounded-full text-xs font-mono">
+                      <span className="font-bold text-white bg-[#1A1A1A] px-2 py-0.5 rounded text-xs font-mono">
                         Nº {c.number}
                       </span>
-                      <span className="font-bold text-white text-sm">{c.name}</span>
-                      <span className="text-zinc-500 hidden sm:inline">
+                      <span className="font-serif font-bold text-[#1A1A1A] text-base">{c.name}</span>
+                      <span className="text-[#6B6B6B] hidden sm:inline font-sans">
                         ({c.partyOrSlate})
                       </span>
                     </div>
                     <div className="text-right">
-                      <strong className="text-white text-sm font-bold">{c.votes}</strong>
-                      <span className="text-zinc-400 ml-1.5 text-xs">({c.percentage}%)</span>
+                      <strong className="text-[#1A1A1A] text-sm font-bold">{c.votes}</strong>
+                      <span className="text-[#6B6B6B] ml-1.5 text-xs">({c.percentage}%)</span>
                     </div>
                   </div>
                   
-                  {/* Barra Arredondada Moderna */}
-                  <div className="w-full h-2.5 rounded-full bg-zinc-800/80 overflow-hidden">
+                  {/* Barra Dourada Editorial */}
+                  <div className="w-full h-2 rounded bg-white border border-[#E8E4DF] overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-sm shadow-emerald-500/30 transition-all duration-500"
+                      className="h-full bg-[#B8860B] transition-all duration-500"
                       style={{
                         width: `${Math.max(parseFloat(c.percentage), totalVotesAcrossUrnas > 0 ? 3 : 0)}%`,
                       }}
@@ -379,25 +376,25 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
 
               {/* Brancos e Nulos */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3.5 rounded-xl bg-zinc-900/40 border border-zinc-800 flex justify-between items-center text-xs font-mono">
-                  <span className="text-zinc-400">VOTOS EM BRANCO:</span>
-                  <span className="font-bold text-white text-sm">{blankVotesTotal}</span>
+                <div className="p-3.5 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex justify-between items-center text-xs font-mono">
+                  <span className="text-[#6B6B6B]">VOTOS EM BRANCO:</span>
+                  <span className="font-bold text-[#1A1A1A] text-sm">{blankVotesTotal}</span>
                 </div>
-                <div className="p-3.5 rounded-xl bg-zinc-900/40 border border-zinc-800 flex justify-between items-center text-xs font-mono">
-                  <span className="text-zinc-400">VOTOS NULOS:</span>
-                  <span className="font-bold text-white text-sm">{nullVotesTotal}</span>
+                <div className="p-3.5 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex justify-between items-center text-xs font-mono">
+                  <span className="text-[#6B6B6B]">VOTOS NULOS:</span>
+                  <span className="font-bold text-[#1A1A1A] text-sm">{nullVotesTotal}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Painel Lateral: Urnas & Garantias em Ilha */}
+          {/* Painel Lateral: Urnas & Garantias */}
           <div className="lg:col-span-4 space-y-6">
 
             {/* Status das Urnas */}
-            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
-              <h4 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-white">
-                <Layers className="w-4 h-4 text-emerald-400" />
+            <div className="p-6 rounded-md bg-white border border-[#E8E4DF] shadow-sm space-y-4">
+              <h4 className="flex items-center gap-2 small-caps text-[#1A1A1A]">
+                <Layers className="w-4 h-4 text-[#B8860B]" />
                 <span>VOTOS POR TERMINAL</span>
               </h4>
 
@@ -407,15 +404,15 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                   return (
                     <div
                       key={u.id}
-                      className="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-800 flex items-center justify-between text-xs font-mono"
+                      className="p-3.5 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-between text-xs font-mono"
                     >
                       <div>
-                        <div className="font-bold text-white">{u.id}</div>
-                        <div className="text-[11px] text-zinc-400">{u.location}</div>
+                        <div className="font-bold text-[#1A1A1A]">{u.id}</div>
+                        <div className="text-[11px] text-[#6B6B6B]">{u.location}</div>
                       </div>
                       <div className="text-right">
-                        <span className="font-bold text-emerald-400 text-base">{votesInUrna}</span>
-                        <span className="block text-[10px] text-zinc-500">VOTOS</span>
+                        <span className="font-bold text-[#B8860B] text-base">{votesInUrna}</span>
+                        <span className="block text-[10px] text-[#8C8883]">VOTOS</span>
                       </div>
                     </div>
                   );
@@ -424,22 +421,22 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
             </div>
 
             {/* Garantias Criptográficas */}
-            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
-              <h4 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-white">
-                <FileCheck2 className="w-4 h-4 text-emerald-400" />
+            <div className="p-6 rounded-md bg-white border border-[#E8E4DF] shadow-sm space-y-4">
+              <h4 className="flex items-center gap-2 small-caps text-[#1A1A1A]">
+                <FileCheck2 className="w-4 h-4 text-[#B8860B]" />
                 <span>GARANTIAS CRIPTOGRÁFICAS</span>
               </h4>
 
-              <div className="space-y-3 text-xs font-mono text-zinc-400">
+              <div className="space-y-3 text-xs font-mono text-[#6B6B6B]">
                 {[
-                  { label: 'Não-Duplicidade:', text: 'Cada eleitor possui PIN de uso único destruído após votar.' },
-                  { label: 'Voto Secreto:', text: 'O RDV embaralha as cédulas sem dados do eleitor.' },
+                  { label: 'Não-Duplicidade:', text: 'PIN exclusivo descartado no ato da votação.' },
+                  { label: 'Voto Secreto:', text: 'RDV embaralha ordens aleatoriamente sem dados pessoais.' },
                   { label: 'Merkle Root On-Chain:', text: 'Raiz imutável transmitida para a Solana.' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#166534] shrink-0 mt-0.5" />
                     <span>
-                      <strong className="text-white">{item.label}</strong>{' '}
+                      <strong className="text-[#1A1A1A]">{item.label}</strong>{' '}
                       {item.text}
                     </span>
                   </div>
@@ -452,37 +449,37 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
         </div>
       )}
 
-      {/* SEÇÃO 2: VERIFICAÇÃO INDIVIDUAL DO COMPROVANTE (MERKLE PROOF) EM ILHA */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
+      {/* SEÇÃO 2: VERIFICAÇÃO INDIVIDUAL DO COMPROVANTE (MERKLE PROOF) */}
+      <div className="p-6 sm:p-8 rounded-md bg-white border border-[#E8E4DF] shadow-sm">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md shadow-emerald-500/20">
+          <div className="w-12 h-12 mx-auto rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#B8860B] shadow-sm">
             <Sparkles className="w-6 h-6" />
           </div>
           
-          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-            VERIFIQUE SE O SEU VOTO FOI COMPUTADO
+          <h2 className="font-serif font-bold text-xl text-[#1A1A1A] tracking-tight">
+            Verifique se o seu voto foi computado
           </h2>
           
-          <p className="text-xs text-zinc-400 font-mono">
-            Insira o código do seu comprovante impresso (Ex: <code className="text-emerald-400 bg-black/40 px-1.5 py-0.5 rounded border border-zinc-800">URNASOL-XXXX-YYYY</code>) para validar a prova matemática de inclusão na Árvore de Merkle:
+          <p className="text-xs text-[#6B6B6B] font-mono">
+            Insira o código do seu comprovante impresso (Ex: <code className="text-[#B8860B] bg-[#FAFAF8] px-1.5 py-0.5 rounded border border-[#E8E4DF]">URNASOL-XXXX-YYYY</code>) para validar a prova matemática de inclusão na Árvore de Merkle:
           </p>
 
           {/* Campo de Busca de Recibo */}
           <form onSubmit={handleVerifyReceipt} className="flex flex-col sm:flex-row gap-2.5 pt-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8883]" />
               <input
                 type="text"
                 placeholder="INSIRA SEU CÓDIGO DE COMPROVANTE..."
                 value={receiptInput}
                 onChange={(e) => setReceiptInput(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                className="serif-input pl-10 text-xs font-mono"
               />
             </div>
             <button
               type="submit"
               disabled={isVerifying || !receiptInput.trim()}
-              className="island-btn-primary rounded-xl text-xs py-2.5 px-5 shrink-0"
+              className="serif-btn-primary rounded-md text-xs py-2 px-5 shrink-0"
             >
               {isVerifying ? 'AUDITANDO...' : 'AUDITAR VOTO'}
             </button>
@@ -490,35 +487,35 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
 
           {/* Resultado Positivo da Verificação */}
           {verificationResult && verificationResult.isValid && (
-            <div className="mt-6 p-6 rounded-2xl bg-zinc-900/80 border border-emerald-500/40 text-left space-y-4 shadow-xl animate-fade-in">
-              <div className="flex items-center gap-3 pb-3 border-b border-zinc-800">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="mt-6 p-6 rounded-md bg-white border border-[#E8E4DF] border-t-2 border-t-[#166534] text-left space-y-4 shadow-sm animate-fade-in">
+              <div className="flex items-center gap-3 pb-3 border-b border-[#E8E4DF]">
+                <div className="w-10 h-10 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#166534] shrink-0">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white tracking-tight">
+                  <h4 className="font-serif font-bold text-base text-[#1A1A1A]">
                     {isClosed
-                      ? 'VOTO 100% COMPUTADO NO RESULTADO OFICIAL!'
-                      : 'COMPROVANTE VÁLIDO — CÉDULA REGISTRADA E LACRADA NO RDV!'}
+                      ? 'Voto 100% Computado no Resultado Oficial!'
+                      : 'Comprovante Válido — Cédula Registrada e Lacrada no RDV!'}
                   </h4>
-                  <p className="text-xs text-emerald-400 font-mono">
+                  <p className="text-xs text-[#166534] font-mono">
                     {isClosed
                       ? 'Prova Matemática de Inclusão (Merkle Proof) Válida'
-                      : 'Prova Matemática Válida • O voto será consolidado no fechamento'}
+                      : 'Prova Matemática Válida • O voto será totalizado no encerramento'}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs font-mono text-zinc-400">
+              <div className="space-y-2 text-xs font-mono text-[#6B6B6B]">
                 {[
                   { label: 'URNA DE ORIGEM:', value: verificationResult.urnaId, bold: true },
                   { label: 'ÍNDICE NO REGISTRO (RDV):', value: `FOLHA #${verificationResult.leafIndex + 1}` },
                   { label: 'HASH DA SUA CÉDULA (LEAF):', value: verificationResult.leaf, accent: true },
-                  { label: 'RAIZ MERKLE GRAVADA NA SOLANA:', value: verificationResult.root, emerald: true },
+                  { label: 'RAIZ MERKLE GRAVADA NA SOLANA:', value: verificationResult.root, gold: true },
                 ].map((row) => (
-                  <div key={row.label} className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-zinc-800/80 break-all">
+                  <div key={row.label} className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-[#FAFAF8] break-all">
                     <span>{row.label}</span>
-                    <span className={row.emerald ? 'text-emerald-400 font-bold' : row.accent ? 'text-white' : 'text-zinc-300'}>
+                    <span className={row.gold ? 'text-[#B8860B] font-bold' : row.accent ? 'text-[#1A1A1A]' : 'text-[#1A1A1A]'}>
                       {row.value}
                     </span>
                   </div>
@@ -533,31 +530,31 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`;
 
                 return (
-                  <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                  <div className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1A1A1A]">
+                        <ShieldCheck className="w-4 h-4 text-[#B8860B]" />
                         <span>REGISTRO OFICIAL ON-CHAIN NA SOLANA DEVNET</span>
                       </div>
                       <a
                         href={explorerUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="island-btn rounded-lg text-xs py-1 px-2.5"
+                        className="serif-btn-outline rounded text-xs py-1 px-2.5"
                       >
                         <ExternalLink className="w-3 h-3" />
                         <span>VER NO EXPLORER</span>
                       </a>
                     </div>
 
-                    <div className="text-[11px] font-mono text-zinc-400 break-all space-y-1">
+                    <div className="text-[11px] font-mono text-[#6B6B6B] break-all space-y-1">
                       <div>
                         <span>ASSINATURA DA TX: </span>
-                        <code className="text-zinc-300">{txSig}</code>
+                        <code className="text-[#1A1A1A]">{txSig}</code>
                       </div>
                       <div>
                         <span>RAIZ ON-CHAIN: </span>
-                        <code className="text-emerald-400">{verificationResult.root.slice(0, 20)}...</code>
+                        <code className="text-[#B8860B]">{verificationResult.root.slice(0, 20)}...</code>
                       </div>
                     </div>
                   </div>
@@ -565,19 +562,19 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
               })()}
 
               {/* Script de Auditoria Independente */}
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
-                  <Terminal className="w-4 h-4 text-emerald-400" />
+              <div className="p-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1A1A1A]">
+                  <Terminal className="w-4 h-4 text-[#B8860B]" />
                   <span>AUDITORIA INDEPENDENTE VIA TERMINAL:</span>
                 </div>
-                <p className="text-xs text-zinc-400 font-mono">
-                  Qualquer cidadão pode rodar o verificador criptográfico em sua própria máquina:
+                <p className="text-xs text-[#6B6B6B] font-mono">
+                  Qualquer pessoa pode rodar o verificador criptográfico em sua própria máquina:
                 </p>
-                <div className="p-3 rounded-lg bg-black/80 border border-zinc-800 flex items-center justify-between gap-2 text-xs font-mono text-emerald-400">
+                <div className="p-3 rounded bg-white border border-[#E8E4DF] flex items-center justify-between gap-2 text-xs font-mono text-[#B8860B]">
                   <code>node auditar-voto.mjs {receiptInput.trim()}</code>
                   <button
                     onClick={() => navigator.clipboard.writeText(`node auditar-voto.mjs ${receiptInput.trim()}`)}
-                    className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                    className="p-1 rounded hover:bg-[#FAFAF8] text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
                     title="Copiar comando"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -585,10 +582,10 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-start gap-2.5 text-xs font-mono text-zinc-400">
-                <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-start gap-2.5 text-xs font-mono text-[#6B6B6B]">
+                <Lock className="w-4 h-4 text-[#B8860B] shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-white">Sigilo Preservado:</strong>{' '}
+                  <strong className="text-[#1A1A1A]">Sigilo Preservado:</strong>{' '}
                   A matemática prova que sua cédula foi inclusa na soma total sem revelar publicamente qual foi o seu voto.
                 </span>
               </div>
@@ -597,14 +594,14 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
 
           {/* Erro de Comprovante Não Encontrado */}
           {errorNotFound && (
-            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-left flex items-start gap-3 animate-fade-in">
-              <XCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="mt-6 p-4 rounded-md bg-[#B45309]/10 border border-[#B45309]/30 text-left flex items-start gap-3 animate-fade-in">
+              <XCircle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
               <div className="text-xs font-mono">
-                <div className="font-bold text-amber-300 mb-1">COMPROVANTE NÃO LOCALIZADO</div>
-                <p className="text-zinc-400">
+                <div className="font-bold text-[#B45309] mb-1">COMPROVANTE NÃO LOCALIZADO</div>
+                <p className="text-[#6B6B6B]">
                   Verifique se o código foi digitado corretamente (Ex:{' '}
-                  <code className="text-emerald-400 bg-black/40 px-1 py-0.5 rounded border border-zinc-800">URNASOL-XXXX-YYYY</code>)
-                  ou emita seu voto na cabine da urna antes de auditar.
+                  <code className="text-[#B8860B] bg-white px-1 py-0.5 rounded border border-[#E8E4DF]">URNASOL-XXXX-YYYY</code>)
+                  ou vote primeiro na cabine da urna antes de auditar.
                 </p>
               </div>
             </div>

@@ -42,7 +42,6 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
 
   // Mesário libera cabine para o eleitor
   const handleReleaseBooth = (voter: VoterPin) => {
-    // Atualiza estado do votante como AUTORIZADO para votar
     const updatedVoters = election.voterPins.map((v) =>
       v.pin === voter.pin ? { ...v, isAuthorized: true } : v
     );
@@ -83,166 +82,166 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6">
 
-      {/* Cabeçalho do Terminal do Mesário em Ilha */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
+      {/* Cabeçalho do Terminal do Mesário Editorial */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-6 rounded-md bg-white border border-[#E8E4DF] border-t-2 border-t-[#B8860B] shadow-sm">
         <div>
-          <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold tracking-wider text-emerald-400 uppercase">
+          <div className="flex items-center gap-2 mb-1 text-xs font-mono uppercase tracking-[0.12em] text-[#B8860B]">
             <FileCheck className="w-4 h-4" />
             <span>TERMINAL DE IDENTIFICAÇÃO DO ELEITOR</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            CADERNO DE VOTAÇÃO
+          <h1 className="font-serif font-bold text-2xl text-[#1A1A1A] tracking-tight">
+            Caderno de Votação
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-[#6B6B6B] mt-1 font-sans">
             Valide a identidade do eleitor antes de emitir o PIN e liberar a cabine de votação.
           </p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="island-btn-primary rounded-xl self-start md:self-auto text-xs"
+          className="serif-btn-primary rounded-md self-start md:self-auto text-xs"
         >
           <UserPlus className="w-4 h-4" />
           <span>NOVO ELEITOR</span>
         </button>
       </div>
 
-      {/* Cartões de Estatísticas em Ilhas */}
+      {/* Cartões de Estatísticas com Números em Playfair Display */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
 
-        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
+        <div className="p-5 rounded-md bg-white border border-[#E8E4DF] flex items-center justify-between shadow-sm">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+            <div className="small-caps text-[#6B6B6B] mb-1">
               TOTAL DE APTOS
             </div>
-            <div className="text-3xl font-extrabold text-white font-mono">
+            <div className="font-serif text-3xl font-bold text-[#1A1A1A]">
               {votersCount}
             </div>
-            <div className="text-xs text-zinc-500 mt-1">Cadastrados no sistema</div>
+            <div className="text-xs text-[#8C8883] mt-1 font-sans">Registrados no sistema</div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 shadow-inner">
+          <div className="w-12 h-12 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#B8860B]">
             {election.institutionType === 'condo' ? <Building className="w-5 h-5" /> : <GraduationCap className="w-5 h-5" />}
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
+        <div className="p-5 rounded-md bg-white border border-[#E8E4DF] flex items-center justify-between shadow-sm">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+            <div className="small-caps text-[#6B6B6B] mb-1">
               COMPARECERAM
             </div>
-            <div className="text-3xl font-extrabold text-white font-mono">
+            <div className="font-serif text-3xl font-bold text-[#1A1A1A]">
               {votedCount}
             </div>
-            <div className="text-xs text-zinc-500 mt-1">Votaram até o momento</div>
+            <div className="text-xs text-[#8C8883] mt-1 font-sans">Votaram até o momento</div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+          <div className="w-12 h-12 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#166534]">
             <CheckCircle className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
+        <div className="p-5 rounded-md bg-white border border-[#E8E4DF] flex items-center justify-between shadow-sm">
           <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+            <div className="small-caps text-[#6B6B6B] mb-1">
               QUÓRUM ELEITORAL
             </div>
-            <div className="text-3xl font-extrabold text-emerald-400 font-mono">
+            <div className="font-serif text-3xl font-bold text-[#B8860B]">
               {turnoutPercentage}%
             </div>
-            <div className="text-xs text-zinc-500 mt-1">Participação total</div>
+            <div className="text-xs text-[#8C8883] mt-1 font-sans">Participação total</div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+          <div className="w-12 h-12 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#B8860B]">
             <Users className="w-5 h-5" />
           </div>
         </div>
 
       </div>
 
-      {/* Barra de Busca em Ilha */}
-      <div className="p-3 mb-4 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
+      {/* Barra de Busca */}
+      <div className="p-3 mb-4 rounded-md bg-white border border-[#E8E4DF] shadow-sm">
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8883]" />
           <input
             type="text"
             placeholder="BUSCAR POR APARTAMENTO, NOME OU IDENTIFICADOR..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] text-[#1A1A1A] placeholder-[#8C8883] text-xs font-mono focus:outline-none focus:border-[#B8860B] focus:ring-1 focus:ring-[#B8860B]/30 transition-all"
           />
         </div>
       </div>
 
-      {/* Tabela do Caderno de Eleitores em Ilha Arredondada */}
-      <div className="rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md overflow-hidden shadow-xl">
+      {/* Tabela do Caderno de Eleitores com Linhas Finas */}
+      <div className="rounded-md bg-white border border-[#E8E4DF] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
+            <thead className="bg-[#FAFAF8] border-b border-[#E8E4DF] text-[#6B6B6B]">
               <tr>
-                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold uppercase tracking-[0.1em] text-[11px]">
                   IDENTIFICAÇÃO / UNIDADE
                 </th>
-                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold uppercase tracking-[0.1em] text-[11px]">
                   NOME DO ELEITOR
                 </th>
-                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold uppercase tracking-[0.1em] text-[11px]">
                   PIN
                 </th>
-                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold uppercase tracking-[0.1em] text-[11px]">
                   STATUS
                 </th>
-                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-right">
+                <th className="py-3 px-4 font-semibold uppercase tracking-[0.1em] text-[11px] text-right">
                   AÇÃO
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/60">
+            <tbody className="divide-y divide-[#E8E4DF]">
               {filteredVoters.map((voter) => (
                 <tr
                   key={voter.pin}
                   className={`transition-colors ${
-                    voter.isUsed ? 'bg-zinc-900/20 text-zinc-500' : 'hover:bg-zinc-900/40 text-zinc-300'
+                    voter.isUsed ? 'bg-[#FAFAF8]/60 text-[#8C8883]' : 'hover:bg-[#FAFAF8] text-[#1A1A1A]'
                   }`}
                 >
-                  <td className="py-3 px-4 font-bold text-white">
+                  <td className="py-3.5 px-4 font-semibold text-[#1A1A1A]">
                     {voter.voterIdentifier}
                   </td>
-                  <td className="py-3 px-4 text-zinc-400">
+                  <td className="py-3.5 px-4 text-[#6B6B6B] font-sans">
                     {voter.voterName || '—'}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-mono">
+                  <td className="py-3.5 px-4">
+                    <span className="px-2 py-0.5 rounded bg-[#FAFAF8] border border-[#E8E4DF] text-[#1A1A1A] text-xs font-mono">
                       {voter.pin}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-3.5 px-4">
                     {voter.isUsed ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-zinc-800/60 text-zinc-400 border border-zinc-700">
-                        <CheckCircle className="w-3 h-3 text-emerald-400" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#FAFAF8] text-[#8C8883] border border-[#E8E4DF]">
+                        <CheckCircle className="w-3 h-3 text-[#166534]" />
                         JÁ VOTOU
                       </span>
                     ) : voter.isAuthorized ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#B8860B]/10 text-[#B8860B] border border-[#B8860B]/30">
                         CABINE LIBERADA
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-zinc-900 text-zinc-400 border border-zinc-800">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#FAFAF8] text-[#6B6B6B] border border-[#E8E4DF]">
                         APTO A VOTAR
                       </span>
                     )}
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-3.5 px-4 text-right">
                     {voter.isUsed ? (
-                      <span className="text-[11px] text-zinc-500 font-mono">
+                      <span className="text-[11px] text-[#8C8883] font-mono">
                         VOTOU ÀS {voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : '--:--'}
                       </span>
                     ) : (
                       <button
                         onClick={() => handleReleaseBooth(voter)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono transition-all ${
                           voter.isAuthorized
-                            ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
-                            : 'bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500'
+                            ? 'bg-[#B8860B] text-white border border-[#B8860B] font-semibold shadow-sm'
+                            : 'bg-white border border-[#E8E4DF] text-[#1A1A1A] hover:border-[#B8860B] hover:text-[#B8860B]'
                         }`}
                       >
                         <KeyRound className="w-3 h-3" />
@@ -257,27 +256,27 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
         </div>
       </div>
 
-      {/* Modal de Cabine Liberada em Ilha Arredondada */}
+      {/* Modal de Cabine Liberada em Estilo Editorial */}
       {activeReleasedPin && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl shadow-black/80 animate-fade-in text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
+          <div className="max-w-md w-full p-8 rounded-lg bg-white border border-[#E8E4DF] border-t-4 border-t-[#B8860B] shadow-2xl animate-fade-in text-center">
             
-            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] flex items-center justify-center text-[#166534] shadow-sm">
               <CheckCircle className="w-7 h-7" />
             </div>
 
-            <h3 className="font-bold text-lg text-white tracking-tight mb-1">
-              CABINE LIBERADA!
+            <h3 className="font-serif font-bold text-xl text-[#1A1A1A] tracking-tight mb-1">
+              Cabine Liberada
             </h3>
-            <p className="text-xs text-zinc-400 mb-6 font-mono">
-              O eleitor <strong className="text-white">{activeReleasedPin.voterIdentifier}</strong> foi identificado e está apto a votar na urna.
+            <p className="text-xs text-[#6B6B6B] mb-6 font-sans">
+              O eleitor <strong className="text-[#1A1A1A]">{activeReleasedPin.voterIdentifier}</strong> foi autenticado e está apto a votar com sigilo.
             </p>
 
-            <div className="p-5 mb-6 rounded-2xl bg-zinc-900/70 border border-emerald-500/30 text-center">
-              <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-2">
+            <div className="p-5 mb-6 rounded-md bg-[#FAFAF8] border border-[#E8E4DF] text-center">
+              <div className="small-caps text-[#6B6B6B] mb-2">
                 PIN DE AUTORIZAÇÃO ÚNICO:
               </div>
-              <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400">
+              <div className="font-mono text-4xl font-bold tracking-widest text-[#B8860B]">
                 {activeReleasedPin.pin}
               </div>
             </div>
@@ -288,14 +287,14 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                   onSelectVoterToVote(activeReleasedPin.pin);
                   setActiveReleasedPin(null);
                 }}
-                className="island-btn-primary rounded-xl w-full py-3"
+                className="serif-btn-primary rounded-md w-full py-3"
               >
                 <span>IR PARA A CABINE</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setActiveReleasedPin(null)}
-                className="island-btn rounded-xl w-full py-2.5"
+                className="serif-btn-outline rounded-md w-full py-2.5"
               >
                 <span>FECHAR — CONTINUAR NO MESÁRIO</span>
               </button>
@@ -304,16 +303,16 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
         </div>
       )}
 
-      {/* Modal de Cadastro de Novo Eleitor em Ilha */}
+      {/* Modal de Cadastro de Novo Eleitor */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl shadow-black/80 animate-fade-in">
-            <h3 className="font-bold text-base text-white tracking-tight mb-4">
-              ADICIONAR ELEITOR AO CADERNO
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/60 backdrop-blur-sm">
+          <div className="max-w-md w-full p-8 rounded-lg bg-white border border-[#E8E4DF] border-t-4 border-t-[#B8860B] shadow-2xl animate-fade-in">
+            <h3 className="font-serif font-bold text-lg text-[#1A1A1A] tracking-tight mb-4">
+              Adicionar Eleitor ao Caderno
             </h3>
             <form onSubmit={handleAddVoter} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block small-caps text-[#6B6B6B] mb-1.5">
                   IDENTIFICADOR / APARTAMENTO / MATRÍCULA *
                 </label>
                 <input
@@ -322,12 +321,12 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                   placeholder="Ex: APTO 502 - BLOCO C"
                   value={newIdentifier}
                   onChange={(e) => setNewIdentifier(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input text-xs font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                <label className="block small-caps text-[#6B6B6B] mb-1.5">
                   NOME DO ELEITOR (OPCIONAL)
                 </label>
                 <input
@@ -335,21 +334,21 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
                   placeholder="Ex: ROBERTO CARLOS PEREIRA"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
+                  className="serif-input text-xs font-sans"
                 />
               </div>
 
-              <div className="flex gap-2.5 pt-2">
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="island-btn rounded-xl flex-1 justify-center"
+                  className="serif-btn-outline rounded-md flex-1 justify-center text-xs"
                 >
                   CANCELAR
                 </button>
                 <button
                   type="submit"
-                  className="island-btn-primary rounded-xl flex-1 justify-center"
+                  className="serif-btn-primary rounded-md flex-1 justify-center text-xs"
                 >
                   SALVAR
                 </button>

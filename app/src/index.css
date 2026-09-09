@@ -1,344 +1,361 @@
 @import "tailwindcss";
 
 /* =============================================================
-   MARIA STYLE — MINIMALISTA, PROFISSIONAL, FUNCIONAL
-   Island Style • Rounded Corners • Solana Devnet Dark Aesthetic
+   DESIGN SYSTEM: SERIF (EDITORIAL CLÁSSICO)
+   Typographic elegance through classical restraint.
+   Playfair Display • Source Sans 3 • IBM Plex Mono
+   Warm Ivory (#FAFAF8) • Rich Black (#1A1A1A) • Burnished Gold (#B8860B)
    ============================================================= */
 
-/* --- Base Reset & Variáveis ---------------------------------- */
+:root {
+  /* Paleta Base Editorial */
+  --background: #FAFAF8;
+  --foreground: #1A1A1A;
+  --muted: #F5F3F0;
+  --muted-foreground: #6B6B6B;
+
+  /* Acento em Ouro Brunido */
+  --accent: #B8860B;
+  --accent-secondary: #D4A84B;
+  --accent-foreground: #FFFFFF;
+  --accent-muted: rgba(184, 134, 11, 0.08);
+
+  /* Superfícies, Bordas & Foco */
+  --border: #E8E4DF;
+  --border-hover: #D1CBC3;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --ring: #B8860B;
+
+  /* Estados Funcionais */
+  --success: #166534;
+  --success-bg: rgba(22, 101, 52, 0.08);
+  --warn: #B45309;
+  --warn-bg: rgba(180, 83, 9, 0.08);
+  --danger: #991B1B;
+  --danger-bg: rgba(153, 27, 27, 0.08);
+
+  /* Aliases para compatibilidade */
+  --bg: #FAFAF8;
+  --fg: #1A1A1A;
+  --fg-dim: #6B6B6B;
+  --fg-muted: #8C8883;
+  --card-bg: #FFFFFF;
+  --card-border: #E8E4DF;
+}
+
+/* Reset & Tipografia Base */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-:root {
-  --bg: #09090b;
-  --bg-subtle: #121216;
-  --card-bg: rgba(18, 18, 22, 0.75);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --card-border-hover: rgba(255, 255, 255, 0.16);
-
-  --fg: #f4f4f5;
-  --fg-dim: #a1a1aa;
-  --fg-muted: #71717a;
-
-  /* Solana Green / Devnet Emerald */
-  --accent: #10b981;
-  --accent-light: #34d399;
-  --accent-glow: rgba(16, 185, 129, 0.25);
-  --accent-subtle: rgba(16, 185, 129, 0.1);
-  --accent-bg: rgba(16, 185, 129, 0.06);
-
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --warn: #f59e0b;
-  --warn-bg: rgba(245, 158, 11, 0.1);
-  --info: #38bdf8;
-  --info-bg: rgba(56, 189, 248, 0.1);
-
-  /* Teclado Urna */
-  --key-branco: #e2e8f0;
-  --key-corrige: #ea580c;
-  --key-confirma: #16a34a;
-}
-
-/* Suporte opcional a tema mantendo compatibilidade com seletor data-theme se necessário */
-[data-theme="day"] {
-  --bg: #f8fafc;
-  --bg-subtle: #f1f5f9;
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --card-border: rgba(0, 0, 0, 0.08);
-  --card-border-hover: rgba(0, 0, 0, 0.16);
-  --fg: #0f172a;
-  --fg-dim: #475569;
-  --fg-muted: #94a3b8;
-  --accent: #059669;
-  --accent-light: #10b981;
-  --accent-glow: rgba(5, 150, 105, 0.2);
-  --accent-subtle: rgba(5, 150, 105, 0.08);
-  --accent-bg: rgba(5, 150, 105, 0.05);
-  --danger: #dc2626;
-  --warn: #d97706;
-}
-
-/* --- Tipografia & Fundo Base --------------------------------- */
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg);
-  color: var(--fg);
+  font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  line-height: 1.5;
-  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px);
-  background-size: 24px 24px;
-  background-attachment: fixed;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-[data-theme="day"] body {
-  background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.06) 1.2px, transparent 1.2px);
+/* Fontes do Design System */
+.font-serif, h1, h2, h3, .serif-title {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Elementos monoespaçados */
-code, kbd, samp, pre, .font-mono {
-  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+.font-sans {
+  font-family: 'Source Sans 3', system-ui, sans-serif;
 }
 
-/* --- Island Design Tokens ------------------------------------ */
-.island-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--card-border);
-  border-radius: 1.5rem; /* 24px */
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.font-mono, code, kbd, samp, pre, .small-caps {
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.island-card:hover {
-  border-color: var(--card-border-hover);
+/* Small Caps Pattern Editorial */
+.small-caps {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
-.island-subcard {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--card-border);
-  border-radius: 1rem; /* 16px */
+/* Sistema de Linhas de Régua (Rule Lines) */
+.rule-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.rule-divider::before,
+.rule-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+}
+
+.rule-divider-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Cartões Editoriais */
+.serif-card, .island-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.04);
+  transition: all 0.2s ease-out;
+}
+
+.serif-card:hover, .island-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.06);
+}
+
+.serif-card-accent {
+  border-top: 2px solid var(--accent);
+}
+
+/* Sub-cartões e Superfícies Muted */
+.serif-subcard, .island-subcard {
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
   transition: all 0.2s ease;
 }
 
-.island-subcard:hover {
-  border-color: var(--card-border-hover);
-  background: rgba(255, 255, 255, 0.05);
+/* Botões Editoriais */
+.serif-btn-primary, .island-btn-primary, .btn-bit-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem; /* 6px */
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent-foreground);
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease-out;
 }
 
-/* Badges e Pílulas */
-.island-pill, .bit-badge {
+.serif-btn-primary:hover, .island-btn-primary:hover, .btn-bit-filled:hover {
+  background-color: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 4px 14px rgba(184, 134, 11, 0.3);
+  transform: translateY(-1px);
+}
+
+.serif-btn-primary:active, .island-btn-primary:active, .btn-bit-filled:active {
+  transform: translateY(0);
+}
+
+.serif-btn-outline, .island-btn, .btn-bit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+  background-color: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.serif-btn-outline:hover, .island-btn:hover, .btn-bit:hover {
+  background-color: var(--muted);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Badges e Pílulas Editoriais */
+.serif-pill, .island-pill, .bit-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--fg-dim);
-  border: 1px solid var(--card-border);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
 }
 
-.island-pill-accent, .bit-badge-accent {
-  background: var(--accent-subtle);
-  color: var(--accent-light);
-  border-color: rgba(16, 185, 129, 0.3);
+.serif-pill-accent, .island-pill-accent, .bit-badge-accent {
+  background-color: var(--accent-muted);
+  color: var(--accent);
+  border-color: rgba(184, 134, 11, 0.3);
 }
 
-.island-pill-danger, .bit-badge-danger {
-  background: var(--danger-bg);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.3);
+.serif-pill-danger, .island-pill-danger, .bit-badge-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+  border-color: rgba(153, 27, 27, 0.3);
 }
 
-.island-pill-warn, .bit-badge-warn {
-  background: var(--warn-bg);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.3);
+.serif-pill-warn, .island-pill-warn, .bit-badge-warn {
+  background-color: var(--warn-bg);
+  color: var(--warn);
+  border-color: rgba(180, 83, 9, 0.3);
 }
 
-/* Botões Modernos Arredondados */
-.island-btn, .btn-bit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem; /* 12px */
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--fg);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--card-border);
-  cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.island-btn:hover, .btn-bit:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--card-border-hover);
-  transform: translateY(-1px);
-}
-
-.island-btn:active, .btn-bit:active {
-  transform: translateY(0);
-}
-
-.island-btn-primary, .btn-bit-filled {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1.125rem;
-  border-radius: 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: #042f1e;
-  background-color: var(--accent);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 15px var(--accent-glow);
-  cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.island-btn-primary:hover, .btn-bit-filled:hover {
-  background-color: var(--accent-light);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-  transform: translateY(-1px);
-  color: #021f14;
-}
-
-.island-btn-primary:active, .btn-bit-filled:active {
-  transform: translateY(0);
-}
-
-/* Inputs em Ilhas */
-.island-input, .input-bit {
-  background: rgba(15, 15, 20, 0.8);
-  border: 1px solid var(--card-border);
-  border-radius: 0.75rem;
+/* Inputs Editoriais */
+.serif-input, .island-input, .input-bit {
+  width: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem; /* 6px */
   padding: 0.625rem 0.875rem;
-  color: var(--fg);
+  font-family: 'Source Sans 3', sans-serif;
   font-size: 0.875rem;
-  transition: all 0.15s ease;
+  color: var(--foreground);
   outline: none;
+  transition: all 0.15s ease-out;
 }
 
-.island-input:focus, .input-bit:focus {
+.serif-input:hover, .island-input:hover {
+  border-color: var(--border-hover);
+}
+
+.serif-input:focus, .island-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  box-shadow: 0 0 0 2px var(--accent-muted);
 }
 
-/* --- Urna Eletrônica (Hardware Chassis & Display Island) ------ */
+/* --- Urna Eletrônica (Console Editorial de Votação) ----------- */
 .urna-chassis {
-  background: linear-gradient(160deg, #131318 0%, #0c0c10 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 2rem; /* 32px */
-  padding: 1.75rem;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background-color: #FFFFFF;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 0.75rem; /* 12px */
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(26, 26, 26, 0.05);
 }
 
 .urna-screen {
-  background: #040406;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.25rem; /* 20px */
-  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.9);
-  color: #f4f4f5;
+  background-color: #FAFAF8;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: inset 0 1px 3px rgba(26, 26, 26, 0.04);
+  color: var(--foreground);
 }
 
 .urna-keypad {
-  background: rgba(22, 22, 28, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.25rem; /* 20px */
-  padding: 1.25rem;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
 }
 
 /* Teclas Numéricas */
 .urna-key-num {
-  background: linear-gradient(180deg, #24242e 0%, #1a1a22 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.75rem; /* 12px */
-  color: #ffffff;
-  font-family: 'JetBrains Mono', monospace;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  color: var(--foreground);
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 1.25rem;
-  font-weight: 700;
-  box-shadow: 0 4px 0 #0d0d12, 0 6px 12px rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(26, 26, 26, 0.05);
   cursor: pointer;
-  transition: all 0.06s ease;
+  transition: all 0.1s ease;
   user-select: none;
 }
 
 .urna-key-num:hover {
-  background: linear-gradient(180deg, #2c2c38 0%, #20202a 100%);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: #FAFAF8;
 }
 
 .urna-key-num:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #0d0d12, 0 2px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(26, 26, 26, 0.05);
 }
 
-/* Teclas Especiais da Urna */
+/* Teclas Funcionais */
 .urna-key-branco {
-  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  color: #0f172a;
-  border: 1px solid #ffffff;
-  border-radius: 0.75rem;
+  background-color: #FFFFFF;
+  color: var(--foreground);
+  border: 1px solid var(--border-hover);
+  border-radius: 0.375rem;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  box-shadow: 0 4px 0 #94a3b8, 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(26, 26, 26, 0.05);
   cursor: pointer;
-  transition: all 0.06s ease;
-  user-select: none;
+  transition: all 0.1s ease;
 }
 
 .urna-key-branco:hover {
-  background: #ffffff;
-}
-
-.urna-key-branco:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #94a3b8;
+  background-color: var(--muted);
+  border-color: var(--foreground);
 }
 
 .urna-key-corrige {
-  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.75rem;
+  background-color: #C2410C;
+  color: #FFFFFF;
+  border: 1px solid #C2410C;
+  border-radius: 0.375rem;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  box-shadow: 0 4px 0 #9a3412, 0 6px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 6px rgba(194, 65, 12, 0.25);
   cursor: pointer;
-  transition: all 0.06s ease;
-  user-select: none;
+  transition: all 0.1s ease;
 }
 
 .urna-key-corrige:hover {
-  background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
-}
-
-.urna-key-corrige:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #9a3412;
+  background-color: #9A3412;
 }
 
 .urna-key-confirma {
-  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.75rem;
+  background-color: #15803D;
+  color: #FFFFFF;
+  border: 1px solid var(--accent);
+  border-radius: 0.375rem;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.8125rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  box-shadow: 0 5px 0 #14532d, 0 8px 16px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 3px 8px rgba(21, 128, 61, 0.3);
   cursor: pointer;
-  transition: all 0.06s ease;
-  user-select: none;
+  transition: all 0.1s ease;
 }
 
 .urna-key-confirma:hover {
-  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-  box-shadow: 0 5px 0 #14532d, 0 10px 20px rgba(22, 163, 74, 0.4);
-}
-
-.urna-key-confirma:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 #14532d;
+  background-color: #166534;
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.4);
 }
 
 /* Suavização de scrollbar */
@@ -350,9 +367,9 @@ code, kbd, samp, pre, .font-mono {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: #D1CBC3;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: #A8A29E;
 }
