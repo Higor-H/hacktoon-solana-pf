@@ -1,0 +1,58 @@
+{
+  "electionId": "eleicao-escola-2026",
+  "urnaId": "URNA-ESCOLA-01",
+  "urnaName": "Urna 01 - Biblioteca Central",
+  "totalVotes": 3,
+  "blankVotes": 0,
+  "nullVotes": 0,
+  "candidateTallies": [
+    {
+      "candidateId": 1,
+      "candidateNumber": 11,
+      "candidateName": "Profª Helena Ribeiro",
+      "votes": 2
+    },
+    {
+      "candidateId": 2,
+      "candidateNumber": 22,
+      "candidateName": "Profº Roberto Guimarães",
+      "votes": 1
+    }
+  ],
+  "merkleRoot": "18f4ddbd54b6924fd9b0d8170f4e435eda551a04c2470aca9c18c9da231515f1",
+  "receiptLeaves": [
+    "5c3ee3338aa294d1093145e4d5b735601e5efed23a0129f9988f735fe6c0aa82",
+    "b7cf058e2b8e708c60481616095b7b5cb3e23518d3683f7c345a707b017d5268",
+    "630418d3c7c830efe0b9e02594362bd3c1e01fc0427bc1e823d157337a047089"
+  ],
+  "ed25519Signature": "7787ede6c723719ac7b7005e82c010d1f3552287dfed408043c06103b1e6bc898e4b55c1dd391e6a9897311406f8668a92edb783dea74ff7107b16fe3d936902",
+  "urnaPubkey": "BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG",
+  "digest": "21cdca9410974e39a200a980bd485908823d9ec31e9ec9f3b8b225791179d10c",
+  "txSignature": "5fhEytHmQtzxLXErhUcF6L6BKwqT9nNQQf6hYSqiNiHxPBpp4KZnt6mDKRrnH54tou951d4kvFbV7CjouumaKAwb",
+  "votes": [
+    {
+      "id": "vote_1788918776975_is5zy",
+      "urnaId": "URNA-ESCOLA-01",
+      "electionId": "eleicao-escola-2026",
+      "candidateNumber": 22,
+      "receiptCode": "URNSOL-61C4-80E2",
+      "receiptHash": "5c3ee3338aa294d1093145e4d5b735601e5efed23a0129f9988f735fe6c0aa82"
+    },
+    {
+      "id": "vote_1788918831290_2bbrd",
+      "urnaId": "URNA-ESCOLA-01",
+      "electionId": "eleicao-escola-2026",
+      "candidateNumber": 11,
+      "receiptCode": "URNSOL-8CB2-987A",
+      "receiptHash": "b7cf058e2b8e708c60481616095b7b5cb3e23518d3683f7c345a707b017d5268"
+    },
+    {
+      "id": "vote_1788918691832_3vrqw",
+      "urnaId": "URNA-ESCOLA-01",
+      "electionId": "eleicao-escola-2026",
+      "candidateNumber": 11,
+      "receiptCode": "URNSOL-982A-E025",
+      "receiptHash": "630418d3c7c830efe0b9e02594362bd3c1e01fc0427bc1e823d157337a047089"
+    }
+  ]
+}

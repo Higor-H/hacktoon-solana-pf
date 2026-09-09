@@ -9,17 +9,32 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { createDefaultElection } from './lib/electionPresets';
 import type { Election } from './lib/types';
 import { offlineUrnaService } from './lib/offlineUrna';
-import { solanaService, TARGET_WALLET_PUBKEY } from './lib/solanaService';
+import { solanaService, TARGET_WALLET_PUBKEY, TARGET_WALLET_SECRET_KEY } from './lib/solanaService';
 import { ShieldCheck, HardDrive, Cpu, Terminal } from 'lucide-react';
 
 export type ThemeType = 'serif';
 
 export const App: React.FC = () => {
   const [election, setElection] = useState<Election>(() => {
+    // Garante que as chaves da carteira fixa estejam gravadas desde o primeiro instante
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+      localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
+      solanaService.ensurePreferredKey();
+    }
+
     const saved = localStorage.getItem('urnasol_election_data');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // Garante que a URNA-01 use sempre a carteira oficial
+        if (parsed.urnas && parsed.urnas.length > 0) {
+          const u1 = parsed.urnas.find((u: { id: string }) => u.id === 'URNA-01') || parsed.urnas[0];
+          if (u1 && (u1.publicKey !== TARGET_WALLET_PUBKEY || !u1.secretKey)) {
+            u1.publicKey = TARGET_WALLET_PUBKEY;
+            u1.secretKey = TARGET_WALLET_SECRET_KEY;
+          }
+        }
         const totalVotes = (parsed.urnas || []).flatMap((u: { id: string }) => offlineUrnaService.getVotes(u.id)).length;
         if (totalVotes === 0 && parsed.voterPins) {
           parsed.voterPins = parsed.voterPins.map((v: { pin: string }) => ({
@@ -44,14 +59,10 @@ export const App: React.FC = () => {
 
   // Persiste mudanças na eleição e sincroniza a carteira fixa
   useEffect(() => {
+    localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+    localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
+    solanaService.ensurePreferredKey();
     localStorage.setItem('urnasol_election_data', JSON.stringify(election));
-
-    const targetUrna = (election.urnas || []).find((u) => u.publicKey === TARGET_WALLET_PUBKEY);
-    if (targetUrna && targetUrna.secretKey) {
-      localStorage.setItem('urnasol_fixed_secret', targetUrna.secretKey);
-      localStorage.setItem('urnasol_organizer_key', targetUrna.secretKey);
-      solanaService.ensurePreferredKey();
-    }
   }, [election]);
 
   // Urna selecionada ativa

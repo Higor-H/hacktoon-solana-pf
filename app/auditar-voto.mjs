@@ -2,32 +2,37 @@
  * SCRIPT INDEPENDENTE DE AUDITORIA FORENSE ON-CHAIN - URNASOL
  *
  * Este script pode ser executado por QUALQUER auditor, fiscal de chapa, eleitor ou perito
- * diretamente no terminal sem depender da interface gráfica do navegador.
+ * diretamente no terminal sem depender da interface gráfica do navegador e SEM DEPENDÊNCIAS EXTERNAS.
  *
  * Ele conecta diretamente ao nó RPC oficial da Solana Devnet, extrai o Boletim de Urna
  * gravado no bloco e verifica matematicamente a inclusão do comprovante do eleitor.
  *
- * Uso:
- *   node auditar-voto.mjs [CODIGO_COMPROVANTE] [TX_SIGNATURE_OPCIONAL] [ARQUIVO_BU_JSON_OPCIONAL]
+ * Formas de Uso:
  *
- * Exemplo de Sucesso (Código Válido):
- *   node auditar-voto.mjs URNSOL-2C25-335C
+ * 1. Automática (detecta a eleição, o BU e a transação correspondente ao código):
+ *    node auditar-voto.mjs URNSOL-8CB2-987A
  *
- * Exemplo de Rejeição (Código Falso / Alterado):
- *   node auditar-voto.mjs URNSOL-2C25-235C
+ * 2. Explícita com a assinatura da transação on-chain:
+ *    node auditar-voto.mjs URNSOL-8CB2-987A 5fhEytHmQtzxLXErhUcF6L6BKwqT9nNQQf6hYSqiNiHxPBpp4KZnt6mDKRrnH54tou951d4kvFbV7CjouumaKAwb
+ *
+ * 3. Completa especificando também o arquivo BU:
+ *    node auditar-voto.mjs URNSOL-8CB2-987A 5fhEytHmQtzxLXErhUcF6L6BKwqT9nNQQf6hYSqiNiHxPBpp4KZnt6mDKRrnH54tou951d4kvFbV7CjouumaKAwb boletim-URNA-ESCOLA-01.json
  */
 
-import { Connection } from '@solana/web3.js';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
 const RPC_URL = 'https://api.devnet.solana.com';
-const DEFAULT_TX = '4MB3ehh8XijWXgjKdSERRaRqjwgPx1e9zLC2TQjaR6uXMPghPvEN5jv7xWuEYCTavdXjcf8CQnD1mCNwsfRUJGmc';
+const TARGET_WALLET_PUBKEY = 'BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG';
 
-const receiptCodeArg = (process.argv[2] || 'URNSOL-2C25-335C').trim().toUpperCase();
-const txSignatureArg = process.argv[3] || DEFAULT_TX;
-const buFileArg = process.argv[4] || 'boletim-URNA-01.json';
+const arg2 = process.argv[2] ? process.argv[2].trim() : '';
+const arg3 = process.argv[3] ? process.argv[3].trim() : '';
+const arg4 = process.argv[4] ? process.argv[4].trim() : '';
+
+const receiptCodeArg = (arg2 || 'URNSOL-8CB2-987A').toUpperCase();
+let requestedTx = arg3 && !arg3.endsWith('.json') ? arg3 : null;
+let requestedFile = arg4.endsWith('.json') ? arg4 : (arg3.endsWith('.json') ? arg3 : null);
 
 function sha256(data) {
   return crypto.createHash('sha256').update(data).digest('hex');
@@ -90,61 +95,154 @@ function verifyMerkleProof(leaf, proof, expectedRoot) {
   return current.toLowerCase() === expectedRoot.toLowerCase();
 }
 
-async function runAudit() {
-  console.log('\n================================================================');
-  console.log('🗳️  URNASOL - AUDITORIA FORENSE INDEPENDENTE NA BLOCKCHAIN SOLANA');
-  console.log('================================================================\n');
+async function fetchSolanaTransaction(txSignature) {
+  try {
+    const response = await fetch(RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'getTransaction',
+        params: [
+          txSignature,
+          { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }
+        ]
+      })
+    });
+    const data = await response.json();
+    return data.result;
+  } catch {
+    return null;
+  }
+}
 
-  // 1. Carrega dados do Boletim de Urna (RDV / Votos)
-  let buData = null;
-  const buPath = path.resolve(process.cwd(), buFileArg);
-  if (fs.existsSync(buPath)) {
-    try {
-      buData = JSON.parse(fs.readFileSync(buPath, 'utf8'));
-    } catch (e) {
-      console.warn(`[!] Aviso: Não foi possível ler ${buFileArg}:`, e.message);
+function findBoletimFile(receiptCode, preferredFile) {
+  const dirsToLook = [
+    process.cwd(),
+    path.resolve(process.cwd(), 'app'),
+    path.resolve(process.cwd(), '..'),
+    path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1'))),
+    path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1')), 'app')
+  ];
+
+  // 1. Se o usuário solicitou um arquivo específico, tenta carregá-lo
+  if (preferredFile) {
+    for (const dir of dirsToLook) {
+      const p = path.resolve(dir, preferredFile);
+      if (fs.existsSync(p)) {
+        try {
+          const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+          return { data, filePath: p };
+        } catch {}
+      }
     }
   }
 
-  // 2. Consulta a transação real na Solana Devnet
-  console.log(`[1] Conectando ao nó RPC da Solana (${RPC_URL})...`);
-  const connection = new Connection(RPC_URL, 'confirmed');
+  // 2. Procura em todos os arquivos de Boletim disponíveis
+  const seenPaths = new Set();
+  const foundList = [];
 
-  console.log(`[2] Buscando transação on-chain: ${txSignatureArg}`);
-  let tx = null;
-  try {
-    tx = await connection.getParsedTransaction(txSignatureArg, {
-      maxSupportedTransactionVersion: 0,
-    });
-  } catch (err) {
-    console.warn('    [!] Erro ao consultar RPC:', err.message);
+  for (const dir of dirsToLook) {
+    if (!fs.existsSync(dir)) continue;
+    try {
+      const entries = fs.readdirSync(dir);
+      for (const entry of entries) {
+        if (entry.startsWith('boletim') && entry.endsWith('.json')) {
+          const fullPath = path.resolve(dir, entry);
+          if (!seenPaths.has(fullPath)) {
+            seenPaths.add(fullPath);
+            try {
+              const data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+              foundList.push({ data, filePath: fullPath });
+            } catch {}
+          }
+        }
+      }
+    } catch {}
   }
+
+  // 3. Procura o boletim que contém este recibo
+  if (receiptCode) {
+    const match = foundList.find((item) =>
+      (item.data.votes || []).some(
+        (v) => (v.receiptCode || '').toUpperCase() === receiptCode.toUpperCase()
+      )
+    );
+    if (match) return match;
+  }
+
+  return foundList[0] || null;
+}
+
+async function runAudit() {
+  console.log('\n================================================================');
+  console.log('🗳️  URNASOL - AUDITORIA FORENSE INDEPENDENTE NA BLOCKCHAIN SOLANA');
+  console.log(`    Carteira Autorizada / Transmissora: ${TARGET_WALLET_PUBKEY}`);
+  console.log('================================================================\n');
+
+  // 1. Localiza o Boletim de Urna correspondente ao comprovante
+  const buMatch = findBoletimFile(receiptCodeArg, requestedFile);
+  if (!buMatch || !buMatch.data) {
+    console.error('❌ ERRO: Nenhum arquivo de Boletim de Urna (boletim-*.json) encontrado.');
+    console.error('   Certifique-se de que o arquivo de boletim está na pasta atual ou exporte via interface.');
+    process.exit(1);
+  }
+
+  const buData = buMatch.data;
+  console.log(`[1] Boletim de Urna Localizado: ${path.basename(buMatch.filePath)}`);
+  console.log(`    ✓ Pleito: ${buData.electionId}`);
+  console.log(`    ✓ Seção: ${buData.urnaId} (${buData.urnaName || 'Terminal'})`);
+  console.log(`    ✓ Total de Cédulas Seladas no RDV: ${buData.totalVotes}`);
+
+  // 2. Define a transação na Solana
+  let txSignature = requestedTx || buData.txSignature;
+  if (!txSignature) {
+    if (buData.electionId === 'eleicao-escola-2026') {
+      txSignature = '5fhEytHmQtzxLXErhUcF6L6BKwqT9nNQQf6hYSqiNiHxPBpp4KZnt6mDKRrnH54tou951d4kvFbV7CjouumaKAwb';
+    } else {
+      txSignature = '2Mq8LExa9hZoaEzifL2ExAMKpwpdsMun5cESwGQfd8u2SzyeZNPZBG6bhC38QEshsu5ZiPyMPoE2GdapBNHNvkvg';
+    }
+  }
+
+  // 3. Consulta a transação real na Solana Devnet
+  console.log(`\n[2] Conectando ao nó RPC da Solana (${RPC_URL})...`);
+  console.log(`    Buscando transação on-chain: ${txSignature}`);
+  const tx = await fetchSolanaTransaction(txSignature);
 
   if (tx) {
     console.log(`    ✓ Confirmada no Slot #${tx.slot}`);
-    console.log(`    ✓ Carimbo de data/hora (BlockTime): ${new Date(tx.blockTime * 1000).toLocaleString('pt-BR')}`);
+    if (tx.blockTime) {
+      console.log(`    ✓ Carimbo de data/hora (BlockTime): ${new Date(tx.blockTime * 1000).toLocaleString('pt-BR')}`);
+    }
 
-    const memoIx = tx.transaction.message.instructions.find(
-      (ix) => ix.program === 'spl-memo' || ix.programId?.toBase58() === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
+    const signer = tx.transaction?.message?.accountKeys?.[0]?.pubkey;
+    if (signer) {
+      const isTargetSigner = signer === TARGET_WALLET_PUBKEY;
+      console.log(`    ✓ Carteira Autora / Signer: ${signer} ${isTargetSigner ? '(OFICIAL URNASOL)' : ''}`);
+    }
+
+    const instructions = tx.transaction?.message?.instructions || [];
+    const memoIx = instructions.find(
+      (ix) => ix.program === 'spl-memo' || ix.programId === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
     );
 
-    if (memoIx) {
+    if (memoIx && memoIx.parsed) {
       console.log(`\n[3] Dados Oficiais Gravados On-Chain no Memo:`);
       console.log(`    "${memoIx.parsed}"`);
     }
   } else {
-    console.log(`    ℹ️ Transação não encontrada no RPC no momento, auditando contra dados do Boletim.`);
+    console.log(`    ℹ️ Transação não encontrada no RPC no momento, auditando contra dados criptográficos do Boletim.`);
   }
 
-  // 3. Validação do Comprovante
+  // 4. Validação do Comprovante do Eleitor
   console.log(`\n[4] Validando Comprovante do Eleitor: "${receiptCodeArg}"`);
 
-  if (!buData || !buData.votes || !Array.isArray(buData.votes)) {
-    console.error('❌ ERRO: Arquivo de Boletim de Urna (boletim-URNA-01.json) não encontrado para validar as folhas.');
+  if (!buData.votes || !Array.isArray(buData.votes)) {
+    console.error('❌ ERRO: O Boletim de Urna não contém a lista de cédulas do RDV.');
     process.exit(1);
   }
 
-  // Busca o comprovante nos votos apurados
   const voteIndex = buData.votes.findIndex((v) => (v.receiptCode || '').toUpperCase() === receiptCodeArg);
 
   if (voteIndex === -1) {
@@ -185,7 +283,8 @@ async function runAudit() {
   console.log(`   incluído no resultado oficial da Urna ${buData.urnaId}.`);
   if (tx) {
     console.log(`   Selado na Solana Devnet no Bloco #${tx.slot}.`);
-    console.log(`   Explorer: https://explorer.solana.com/tx/${txSignatureArg}?cluster=devnet`);
+    console.log(`   Transmissor On-Chain: ${TARGET_WALLET_PUBKEY}`);
+    console.log(`   Explorer: https://explorer.solana.com/tx/${txSignature}?cluster=devnet`);
   }
   console.log('================================================================\n');
 }

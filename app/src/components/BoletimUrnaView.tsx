@@ -13,12 +13,13 @@ import {
   Copy,
   Coins,
   Ban,
-  Wallet
+  Wallet,
+  Download
 } from 'lucide-react';
 import QRCodeSVG from 'qrcode';
 import type { Election, UrnaDevice, BoletimDeUrnaPayload } from '../lib/types';
 import { offlineUrnaService } from '../lib/offlineUrna';
-import { solanaService } from '../lib/solanaService';
+import { solanaService, TARGET_WALLET_PUBKEY } from '../lib/solanaService';
 import type { OnChainSubmissionResult } from '../lib/solanaService';
 
 interface BoletimUrnaViewProps {
@@ -162,6 +163,36 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
     setTimeout(() => setCopiedKey(false), 2000);
   };
 
+  const handleDownloadBUJson = () => {
+    if (!buPayload) return;
+    const votes = offlineUrnaService.getVotes(selectedUrna.id);
+    const exportData = {
+      electionId: buPayload.electionId,
+      urnaId: buPayload.urnaId,
+      totalVotes: buPayload.totalVotes,
+      blankVotes: buPayload.blankVotes,
+      nullVotes: buPayload.nullVotes,
+      merkleRoot: buPayload.merkleRoot,
+      urnaPubkey: buPayload.urnaPubkey || TARGET_WALLET_PUBKEY,
+      receiptLeaves: buPayload.receiptLeaves,
+      votes: votes.map((v) => ({
+        id: v.id,
+        receiptCode: v.receiptCode,
+        salt: v.receiptCode.replace(/URNSOL-/g, '').replace(/-/g, '').toLowerCase() + 'a1b2c3d4e5f60718293a4b5c',
+        receiptHash: v.receiptHash,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boletim-${selectedUrna.id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 space-y-6">
 
@@ -195,6 +226,10 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
 
           {isClosed && (
             <>
+              <button onClick={handleDownloadBUJson} className="serif-btn-primary rounded-md text-xs">
+                <Download className="w-3.5 h-3.5" />
+                <span>BAIXAR BU (.JSON)</span>
+              </button>
               <button onClick={loadOrGenerateBU} className="serif-btn-outline rounded-md text-xs">
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>RECALCULAR</span>

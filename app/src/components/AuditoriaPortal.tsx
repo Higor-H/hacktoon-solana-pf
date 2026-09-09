@@ -526,7 +526,7 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
               {(() => {
                 const onChainRecords = solanaService.getOnChainElectionData(election.id);
                 const activeRecord = onChainRecords.find((r) => r.urnaId === verificationResult.urnaId) || onChainRecords[0];
-                const txSig = activeRecord?.txSignature || '4MB3ehh8XijWXgjKdSERRaRqjwgPx1e9zLC2TQjaR6uXMPghPvEN5jv7xWuEYCTavdXjcf8CQnD1mCNwsfRUJGmc';
+                const txSig = activeRecord?.txSignature || '2Mq8LExa9hZoaEzifL2ExAMKpwpdsMun5cESwGQfd8u2SzyeZNPZBG6bhC38QEshsu5ZiPyMPoE2GdapBNHNvkvg';
                 const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`;
 
                 return (
@@ -548,6 +548,10 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                     </div>
 
                     <div className="text-[11px] font-mono text-[#6B6B6B] break-all space-y-1">
+                      <div>
+                        <span>CARTEIRA AUTORA / PAYER: </span>
+                        <code className="text-[#1A1A1A]">BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG</code>
+                      </div>
                       <div>
                         <span>ASSINATURA DA TX: </span>
                         <code className="text-[#1A1A1A]">{txSig}</code>

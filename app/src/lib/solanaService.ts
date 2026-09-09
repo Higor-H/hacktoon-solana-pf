@@ -32,75 +32,16 @@ export interface OnChainSubmissionResult {
 }
 
 export const TARGET_WALLET_PUBKEY = 'BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG';
+export const TARGET_WALLET_SECRET_KEY = '2Xg7bUi5nvXuiUVnPnyx9xDYidP3Ty61JHvA8nLET3eKfjNhKfopa8wDnNRiGUGAvC9JsVnpBT3H2AuBHDHxgxLQ';
 
 function resolveInitialKeypair(): Keypair {
+  // A carteira oficial BCxEDMyGm8msF8nprbUyG85dvTnjDWBLBXAXtzW7DEpG é sempre a padrão e obrigatória
+  const targetKp = Keypair.fromSecretKey(bs58.decode(TARGET_WALLET_SECRET_KEY));
   if (typeof localStorage !== 'undefined') {
-    // 1. Verifica se já temos o segredo fixo registrado
-    const fixedSecret = localStorage.getItem('urnasol_fixed_secret');
-    if (fixedSecret) {
-      try {
-        const kp = Keypair.fromSecretKey(bs58.decode(fixedSecret));
-        if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
-          localStorage.setItem('urnasol_organizer_key', fixedSecret);
-          return kp;
-        }
-      } catch {}
-    }
-
-    // 2. Busca na eleição salva se a URNA-01 (ou outra) possui essa chave
-    try {
-      const savedElec = localStorage.getItem('urnasol_election_data');
-      if (savedElec) {
-        const parsed = JSON.parse(savedElec);
-        const match = (parsed.urnas || []).find(
-          (u: { publicKey?: string; secretKey?: string }) =>
-            u.publicKey === TARGET_WALLET_PUBKEY && u.secretKey
-        );
-        if (match && match.secretKey) {
-          const kp = Keypair.fromSecretKey(bs58.decode(match.secretKey));
-          localStorage.setItem('urnasol_fixed_secret', match.secretKey);
-          localStorage.setItem('urnasol_organizer_key', match.secretKey);
-          return kp;
-        }
-      }
-    } catch {}
-
-    // 3. Procura em todas as chaves do localStorage para encontrar o segredo da chave alvo
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k) {
-        const val = localStorage.getItem(k);
-        if (val && val.includes(TARGET_WALLET_PUBKEY)) {
-          try {
-            const parsed = JSON.parse(val);
-            if (parsed.secretKey) {
-              const kp = Keypair.fromSecretKey(bs58.decode(parsed.secretKey));
-              if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
-                localStorage.setItem('urnasol_fixed_secret', parsed.secretKey);
-                localStorage.setItem('urnasol_organizer_key', parsed.secretKey);
-                return kp;
-              }
-            }
-          } catch {}
-        }
-      }
-    }
-
-    // 4. Se já havia uma chave qualquer em urnasol_organizer_key
-    const savedSecret = localStorage.getItem('urnasol_organizer_key');
-    if (savedSecret) {
-      try {
-        return Keypair.fromSecretKey(bs58.decode(savedSecret));
-      } catch {}
-    }
+    localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+    localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
   }
-
-  // 5. Fallback padrão: gera um novo
-  const gen = Keypair.generate();
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('urnasol_organizer_key', bs58.encode(gen.secretKey));
-  }
-  return gen;
+  return targetKp;
 }
 
 export class SolanaService {
@@ -113,12 +54,12 @@ export class SolanaService {
   }
 
   ensurePreferredKey(): void {
-    if (typeof localStorage === 'undefined') return;
-    if (this.organizerKeypair.publicKey.toBase58() === TARGET_WALLET_PUBKEY) return;
-
-    const kp = resolveInitialKeypair();
-    if (kp.publicKey.toBase58() === TARGET_WALLET_PUBKEY) {
-      this.organizerKeypair = kp;
+    if (this.organizerKeypair.publicKey.toBase58() !== TARGET_WALLET_PUBKEY) {
+      this.organizerKeypair = Keypair.fromSecretKey(bs58.decode(TARGET_WALLET_SECRET_KEY));
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+      localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
     }
   }
 

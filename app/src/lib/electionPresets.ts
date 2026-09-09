@@ -2,47 +2,21 @@ import type { Election } from './types';
 import { generateUrnaKeypair } from './cryptoUtils';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
-import { TARGET_WALLET_PUBKEY } from './solanaService';
+import { TARGET_WALLET_PUBKEY, TARGET_WALLET_SECRET_KEY } from './solanaService';
 
-function getUrna1Keypair() {
+export function getUrna1Keypair() {
+  const secretBytes = bs58.decode(TARGET_WALLET_SECRET_KEY);
+  const pair = nacl.sign.keyPair.fromSecretKey(secretBytes);
   if (typeof localStorage !== 'undefined') {
-    const fixedSecret = localStorage.getItem('urnasol_fixed_secret');
-    if (fixedSecret) {
-      try {
-        const secretBytes = bs58.decode(fixedSecret);
-        const pair = nacl.sign.keyPair.fromSecretKey(secretBytes);
-        return {
-          publicKey: bs58.encode(pair.publicKey),
-          secretKey: fixedSecret,
-          publicKeyBytes: pair.publicKey,
-          secretKeyBytes: secretBytes,
-        };
-      } catch {}
-    }
-
-    try {
-      const savedElec = localStorage.getItem('urnasol_election_data');
-      if (savedElec) {
-        const parsed = JSON.parse(savedElec);
-        const match = (parsed.urnas || []).find(
-          (u: { publicKey?: string; secretKey?: string }) =>
-            u.publicKey === TARGET_WALLET_PUBKEY && u.secretKey
-        );
-        if (match && match.secretKey) {
-          const secretBytes = bs58.decode(match.secretKey);
-          const pair = nacl.sign.keyPair.fromSecretKey(secretBytes);
-          localStorage.setItem('urnasol_fixed_secret', match.secretKey);
-          return {
-            publicKey: match.publicKey,
-            secretKey: match.secretKey,
-            publicKeyBytes: pair.publicKey,
-            secretKeyBytes: secretBytes,
-          };
-        }
-      }
-    } catch {}
+    localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+    localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
   }
-  return generateUrnaKeypair();
+  return {
+    publicKey: TARGET_WALLET_PUBKEY,
+    secretKey: TARGET_WALLET_SECRET_KEY,
+    publicKeyBytes: pair.publicKey,
+    secretKeyBytes: secretBytes,
+  };
 }
 
 export function createDefaultElection(): Election {

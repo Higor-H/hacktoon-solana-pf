@@ -12,8 +12,9 @@ import {
 } from 'lucide-react';
 import type { Election, Candidate, UrnaDevice } from '../lib/types';
 import { generateUrnaKeypair } from '../lib/cryptoUtils';
-import { createDefaultElection } from '../lib/electionPresets';
+import { createDefaultElection, getUrna1Keypair } from '../lib/electionPresets';
 import { offlineUrnaService } from '../lib/offlineUrna';
+import { solanaService, TARGET_WALLET_SECRET_KEY } from '../lib/solanaService';
 
 interface AdminDashboardProps {
   election: Election;
@@ -52,7 +53,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Carrega predefinição de Escola
   const handlePresetSchool = () => {
-    const urna1Keys = generateUrnaKeypair();
+    const urna1Keys = getUrna1Keypair();
     const schoolElection: Election = {
       id: 'eleicao-escola-2026',
       title: 'Eleição para Diretor Pedagógico & Grêmio Estudantil',
@@ -186,6 +187,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (window.confirm('Deseja limpar todos os votos locais das urnas para reiniciar o teste?')) {
       election.urnas.forEach((u) => offlineUrnaService.resetUrna(u.id));
       localStorage.clear();
+      localStorage.setItem('urnasol_fixed_secret', TARGET_WALLET_SECRET_KEY);
+      localStorage.setItem('urnasol_organizer_key', TARGET_WALLET_SECRET_KEY);
+      solanaService.ensurePreferredKey();
       onUpdateElection(createDefaultElection());
       triggerNotice('Ambiente de demonstração resetado com sucesso!');
     }
