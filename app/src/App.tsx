@@ -12,6 +12,8 @@ import { offlineUrnaService } from './lib/offlineUrna';
 import { solanaService, TARGET_WALLET_PUBKEY } from './lib/solanaService';
 import { ShieldCheck, HardDrive, Cpu, Terminal } from 'lucide-react';
 
+export type ThemeType = 'night' | 'day' | 'coffee' | 'sakura' | 'cyberpunk';
+
 export const App: React.FC = () => {
   const [election, setElection] = useState<Election>(() => {
     const saved = localStorage.getItem('urnasol_election_data');
@@ -40,6 +42,9 @@ export const App: React.FC = () => {
   const [isOfflineMode, setIsOfflineMode] = useState<boolean>(true);
   const [audioMuted, setAudioMuted] = useState<boolean>(false);
   const [auditReceiptCode, setAuditReceiptCode] = useState<string>('');
+  const [theme, setTheme] = useState<ThemeType>(() => {
+    return (localStorage.getItem('urnasol_theme') as ThemeType) || 'night';
+  });
 
   // Persiste mudanças na eleição e sincroniza a carteira fixa
   useEffect(() => {
@@ -53,6 +58,11 @@ export const App: React.FC = () => {
       solanaService.ensurePreferredKey();
     }
   }, [election]);
+
+  // Persiste o tema
+  useEffect(() => {
+    localStorage.setItem('urnasol_theme', theme);
+  }, [theme]);
 
   // Urna selecionada ativa
   const currentUrna = election.urnas.find((u) => u.id === selectedUrnaId) || election.urnas[0];
@@ -82,9 +92,11 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-black">
-      
-      {/* Barra de Navegação Superior */}
+    <div
+      data-theme={theme}
+      className="min-h-screen flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-300"
+    >
+      {/* Barra de Navegação Superior em Ilha Flutuante */}
       <Navbar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -95,25 +107,27 @@ export const App: React.FC = () => {
         electionTitle={election.title}
         electionStatus={election.status}
         onToggleCloseElection={handleToggleCloseElection}
+        theme={theme}
+        setTheme={setTheme}
       />
 
-      {/* Seletor Rápido de Urna Físico (Caso haja mais de uma urna) */}
+      {/* Seletor Rápido de Urna Físico (Ilha flutuante quando há múltiplas urnas) */}
       {election.urnas.length > 1 && (currentTab === 'urna' || currentTab === 'bu') && (
-        <div className="bg-slate-900/90 border-b border-white/5 py-2 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 my-2 w-full">
+          <div className="rounded-2xl bg-zinc-950/70 border border-zinc-800/80 px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs backdrop-blur-md">
+            <div className="flex items-center gap-2 text-zinc-400">
               <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
               <span>Terminal Físico em Operação:</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {election.urnas.map((u) => (
                 <button
                   key={u.id}
                   onClick={() => setSelectedUrnaId(u.id)}
-                  className={`px-2.5 py-1 rounded-md font-mono transition-all ${
+                  className={`px-3 py-1 rounded-full text-xs font-mono font-medium transition-all ${
                     selectedUrnaId === u.id
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold'
-                      : 'text-slate-400 hover:text-white bg-white/5'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                      : 'bg-zinc-900/60 text-zinc-400 border border-zinc-800 hover:text-zinc-200 hover:bg-zinc-800/60'
                   }`}
                 >
                   {u.id} ({u.location.split('-')[0].trim()})
@@ -125,7 +139,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Conteúdo Principal Renderizado por Aba */}
-      <main className="flex-1">
+      <main className="flex-1 py-4">
         {currentTab === 'urna' && (
           <UrnaTerminal
             election={election}
@@ -170,29 +184,29 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Rodapé Informativo sobre a Arquitetura */}
-      <footer className="border-t border-white/5 bg-slate-950 py-6 px-4 text-xs text-slate-500 mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-300 font-display">UrnaSol</span>
-            <span>•</span>
-            <span>Hackathon Solana 2026</span>
-            <span>•</span>
-            <span className="text-emerald-400">Voto Secreto (RDV) + Offline Air-Gap + Árvore de Merkle</span>
+      {/* Rodapé Informativo em Ilha Suspensa Minimalista */}
+      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 mt-12">
+        <div className="rounded-2xl bg-zinc-950/60 border border-zinc-800/60 backdrop-blur-md px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400">
+          <div className="flex items-center gap-2 font-mono">
+            <span className="text-white font-bold tracking-wider">URNASOL</span>
+            <span className="text-zinc-600">//</span>
+            <span>HACKATHON SOLANA 2026</span>
+            <span className="text-zinc-600">--</span>
+            <span className="text-emerald-400 font-medium">RDV + AIR-GAP + MERKLE</span>
           </div>
 
           <div className="flex items-center gap-4 font-mono text-[11px]">
-            <span className="flex items-center gap-1 text-slate-400">
-              <Cpu className="w-3.5 h-3.5 text-purple-400" />
-              <span>Anchor 0.30</span>
+            <span className="flex items-center gap-1.5 bg-zinc-900/60 px-2.5 py-1 rounded-full border border-zinc-800">
+              <Cpu className="w-3.5 h-3.5 text-zinc-400" />
+              <span>ANCHOR 0.30</span>
             </span>
-            <span className="flex items-center gap-1 text-slate-400">
+            <span className="flex items-center gap-1.5 bg-zinc-900/60 px-2.5 py-1 rounded-full border border-zinc-800">
               <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Solana Devnet</span>
+              <span>SOLANA DEVNET</span>
             </span>
-            <span className="flex items-center gap-1 text-slate-400">
-              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>TSE Inspired</span>
+            <span className="flex items-center gap-1.5 bg-zinc-900/60 px-2.5 py-1 rounded-full border border-zinc-800">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>TSE INSPIRED</span>
             </span>
           </div>
         </div>

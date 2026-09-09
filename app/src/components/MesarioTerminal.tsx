@@ -42,7 +42,7 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
 
   // Mesário libera cabine para o eleitor
   const handleReleaseBooth = (voter: VoterPin) => {
-    // Atualiza estado do votante como AUTORIZADO para votar (mas NÃO marca como usado ainda!)
+    // Atualiza estado do votante como AUTORIZADO para votar
     const updatedVoters = election.voterPins.map((v) =>
       v.pin === voter.pin ? { ...v, isAuthorized: true } : v
     );
@@ -56,7 +56,7 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
     setActiveReleasedPin(voter);
   };
 
-  // Cadastrar novo eleitor na hora (reunião de condomínio/escola)
+  // Cadastrar novo eleitor na hora
   const handleAddVoter = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newIdentifier) return;
@@ -83,143 +83,170 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4">
-      
-      {/* Cabeçalho do Terminal do Mesário */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6">
+
+      {/* Cabeçalho do Terminal do Mesário em Ilha */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
         <div>
-          <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold tracking-wider text-emerald-400 uppercase">
             <FileCheck className="w-4 h-4" />
-            <span>Terminal de Identificação do Eleitor</span>
+            <span>TERMINAL DE IDENTIFICAÇÃO DO ELEITOR</span>
           </div>
-          <h1 className="text-2xl font-black text-white font-display">
-            Caderno de Votação (Check-in do Mesário)
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            CADERNO DE VOTAÇÃO
           </h1>
-          <p className="text-sm text-slate-400">
-            Valide a identidade do morador/aluno antes de liberar a cabine de votação.
+          <p className="text-xs text-zinc-400 mt-1">
+            Valide a identidade do eleitor antes de emitir o PIN e liberar a cabine de votação.
           </p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="btn-secondary self-start md:self-auto"
+          className="island-btn-primary rounded-xl self-start md:self-auto text-xs"
         >
-          <UserPlus className="w-4 h-4 text-emerald-400" />
-          <span>Novo Eleitor no Caderno</span>
+          <UserPlus className="w-4 h-4" />
+          <span>NOVO ELEITOR</span>
         </button>
       </div>
 
-      {/* Cartões de Estatísticas de Quórum / Comparecimento */}
+      {/* Cartões de Estatísticas em Ilhas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="glass-panel p-4 flex items-center justify-between">
+
+        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
           <div>
-            <div className="text-xs text-slate-400 uppercase font-mono">Total de Aptos</div>
-            <div className="text-2xl font-bold text-white font-display mt-1">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+              TOTAL DE APTOS
+            </div>
+            <div className="text-3xl font-extrabold text-white font-mono">
               {votersCount}
             </div>
-            <div className="text-[11px] text-slate-500 mt-1">Registrados no sistema</div>
+            <div className="text-xs text-zinc-500 mt-1">Cadastrados no sistema</div>
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-            {election.institutionType === 'condo' ? <Building className="w-6 h-6" /> : <GraduationCap className="w-6 h-6" />}
+          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 shadow-inner">
+            {election.institutionType === 'condo' ? <Building className="w-5 h-5" /> : <GraduationCap className="w-5 h-5" />}
           </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
           <div>
-            <div className="text-xs text-slate-400 uppercase font-mono">Compareceram</div>
-            <div className="text-2xl font-bold text-emerald-400 font-display mt-1">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+              COMPARECERAM
+            </div>
+            <div className="text-3xl font-extrabold text-white font-mono">
               {votedCount}
             </div>
-            <div className="text-[11px] text-slate-500 mt-1">Votaram até o momento</div>
+            <div className="text-xs text-zinc-500 mt-1">Votaram até o momento</div>
           </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <CheckCircle className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+            <CheckCircle className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="glass-panel p-4 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
           <div>
-            <div className="text-xs text-slate-400 uppercase font-mono">Quórum Eleitoral</div>
-            <div className="text-2xl font-bold text-cyan-400 font-display mt-1">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1">
+              QUÓRUM ELEITORAL
+            </div>
+            <div className="text-3xl font-extrabold text-emerald-400 font-mono">
               {turnoutPercentage}%
             </div>
-            <div className="text-[11px] text-slate-500 mt-1">Participação total</div>
+            <div className="text-xs text-zinc-500 mt-1">Participação total</div>
           </div>
-          <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-            <Users className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+            <Users className="w-5 h-5" />
           </div>
         </div>
+
       </div>
 
-      {/* Barra de Busca */}
-      <div className="glass-panel p-4 mb-6">
+      {/* Barra de Busca em Ilha */}
+      <div className="p-3 mb-4 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
         <div className="relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
-            placeholder="Buscar por Apartamento, Aluno, Matrícula ou Nome..."
+            placeholder="BUSCAR POR APARTAMENTO, NOME OU IDENTIFICADOR..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-950/60 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
           />
         </div>
       </div>
 
-      {/* Tabela do Caderno de Eleitores */}
-      <div className="glass-panel overflow-hidden">
+      {/* Tabela do Caderno de Eleitores em Ilha Arredondada */}
+      <div className="rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-300">
-            <thead className="bg-slate-950/60 border-b border-white/10 text-xs uppercase font-mono text-slate-400">
+          <table className="w-full text-left text-xs font-mono">
+            <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
               <tr>
-                <th className="py-3 px-4">Identificação / Unidade</th>
-                <th className="py-3 px-4">Nome do Eleitor</th>
-                <th className="py-3 px-4">PIN Autorizador</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Ação do Mesário</th>
+                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                  IDENTIFICAÇÃO / UNIDADE
+                </th>
+                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                  NOME DO ELEITOR
+                </th>
+                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                  PIN
+                </th>
+                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider">
+                  STATUS
+                </th>
+                <th className="py-3.5 px-4 font-semibold uppercase tracking-wider text-right">
+                  AÇÃO
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-zinc-800/60">
               {filteredVoters.map((voter) => (
-                <tr key={voter.pin} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3.5 px-4 font-semibold text-white">
+                <tr
+                  key={voter.pin}
+                  className={`transition-colors ${
+                    voter.isUsed ? 'bg-zinc-900/20 text-zinc-500' : 'hover:bg-zinc-900/40 text-zinc-300'
+                  }`}
+                >
+                  <td className="py-3 px-4 font-bold text-white">
                     {voter.voterIdentifier}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-300">
+                  <td className="py-3 px-4 text-zinc-400">
                     {voter.voterName || '—'}
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-xs text-slate-400">
-                    <span className="bg-slate-800/80 px-2 py-1 rounded border border-white/5">
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-mono">
                       {voter.pin}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td className="py-3 px-4">
                     {voter.isUsed ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        Já Votou (Concluído)
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-zinc-800/60 text-zinc-400 border border-zinc-700">
+                        <CheckCircle className="w-3 h-3 text-emerald-400" />
+                        JÁ VOTOU
                       </span>
                     ) : voter.isAuthorized ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                        Cabine Liberada
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        CABINE LIBERADA
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-white/5">
-                        Apto a Votar
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-zinc-900 text-zinc-400 border border-zinc-800">
+                        APTO A VOTAR
                       </span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4 text-right">
+                  <td className="py-3 px-4 text-right">
                     {voter.isUsed ? (
-                      <span className="text-xs text-slate-500 font-mono">
-                        Votou às {voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : '10:00'}
+                      <span className="text-[11px] text-zinc-500 font-mono">
+                        VOTOU ÀS {voter.usedAt ? new Date(voter.usedAt).toLocaleTimeString() : '--:--'}
                       </span>
                     ) : (
                       <button
                         onClick={() => handleReleaseBooth(voter)}
-                        className="btn-primary py-1.5 px-3 text-xs"
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium transition-all ${
+                          voter.isAuthorized
+                            ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                            : 'bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500'
+                        }`}
                       >
-                        <KeyRound className="w-3.5 h-3.5" />
-                        <span>{voter.isAuthorized ? 'Ver PIN' : 'Liberar Voto'}</span>
+                        <KeyRound className="w-3 h-3" />
+                        <span>{voter.isAuthorized ? 'VER PIN' : 'LIBERAR VOTO'}</span>
                       </button>
                     )}
                   </td>
@@ -230,100 +257,101 @@ export const MesarioTerminal: React.FC<MesarioTerminalProps> = ({
         </div>
       </div>
 
-      {/* Modal de Cabine Liberada */}
+      {/* Modal de Cabine Liberada em Ilha Arredondada */}
       {activeReleasedPin && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-fade-in text-center">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-              <CheckCircle className="w-8 h-8" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl shadow-black/80 animate-fade-in text-center">
+            
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+              <CheckCircle className="w-7 h-7" />
             </div>
 
-            <h3 className="text-xl font-bold text-white font-display mb-1">
-              Cabine Liberada!
+            <h3 className="font-bold text-lg text-white tracking-tight mb-1">
+              CABINE LIBERADA!
             </h3>
-            <p className="text-sm text-slate-400 mb-6">
-              O eleitor <strong className="text-white">{activeReleasedPin.voterIdentifier}</strong> foi identificado e está apto a votar em sigilo.
+            <p className="text-xs text-zinc-400 mb-6 font-mono">
+              O eleitor <strong className="text-white">{activeReleasedPin.voterIdentifier}</strong> foi identificado e está apto a votar na urna.
             </p>
 
-            <div className="bg-slate-950 p-4 rounded-xl border border-white/10 mb-6">
-              <div className="text-xs uppercase font-mono text-slate-400 mb-1">
-                PIN de Autorização Único:
+            <div className="p-5 mb-6 rounded-2xl bg-zinc-900/70 border border-emerald-500/30 text-center">
+              <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 mb-2">
+                PIN DE AUTORIZAÇÃO ÚNICO:
               </div>
-              <div className="text-3xl font-black font-mono text-emerald-400 tracking-widest">
+              <div className="font-mono text-3xl sm:text-4xl font-black tracking-widest text-emerald-400">
                 {activeReleasedPin.pin}
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               <button
                 onClick={() => {
                   onSelectVoterToVote(activeReleasedPin.pin);
                   setActiveReleasedPin(null);
                 }}
-                className="btn-primary w-full justify-center"
+                className="island-btn-primary rounded-xl w-full py-3"
               >
-                <span>Ir para a Urna com este Eleitor</span>
+                <span>IR PARA A CABINE</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setActiveReleasedPin(null)}
-                className="btn-secondary w-full justify-center"
+                className="island-btn rounded-xl w-full py-2.5"
               >
-                <span>Fechar e Continuar no Mesário</span>
+                <span>FECHAR — CONTINUAR NO MESÁRIO</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal de Cadastro de Novo Eleitor */}
+      {/* Modal de Cadastro de Novo Eleitor em Ilha */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-fade-in">
-            <h3 className="text-lg font-bold text-white font-display mb-4">
-              Adicionar Eleitor ao Caderno
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="max-w-md w-full p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl shadow-black/80 animate-fade-in">
+            <h3 className="font-bold text-base text-white tracking-tight mb-4">
+              ADICIONAR ELEITOR AO CADERNO
             </h3>
             <form onSubmit={handleAddVoter} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 uppercase mb-1">
-                  Identificador / Apartamento / Matrícula *
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  IDENTIFICADOR / APARTAMENTO / MATRÍCULA *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Apto 502 - Bloco C"
+                  placeholder="Ex: APTO 502 - BLOCO C"
                   value={newIdentifier}
                   onChange={(e) => setNewIdentifier(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 uppercase mb-1">
-                  Nome do Eleitor (Opcional)
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  NOME DO ELEITOR (OPCIONAL)
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: Roberto Carlos Pereira"
+                  placeholder="Ex: ROBERTO CARLOS PEREIRA"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="btn-secondary flex-1 justify-center"
+                  className="island-btn rounded-xl flex-1 justify-center"
                 >
-                  Cancelar
+                  CANCELAR
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex-1 justify-center"
+                  className="island-btn-primary rounded-xl flex-1 justify-center"
                 >
-                  Salvar
+                  SALVAR
                 </button>
               </div>
             </form>

@@ -38,7 +38,7 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
   const [errorNotFound, setErrorNotFound] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // 1. APURAÇÃO EM TEMPO REAL: Lê diretamente todos os votos registrados nas urnas
+  // 1. APURAÇÃO EM TEMPO REAL: Lê diretamente os votos registrados nas urnas
   const allVotes = election.urnas.flatMap((u) => offlineUrnaService.getVotes(u.id));
   const totalVotesAcrossUrnas = allVotes.length;
 
@@ -75,7 +75,6 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
     if (!onUpdateElection) return;
 
     if (!isClosed) {
-      // Fecha a eleição e gera os BUs finais de todas as urnas
       for (const u of election.urnas) {
         await offlineUrnaService.closeUrnaAndGenerateBU(election, u);
       }
@@ -94,7 +93,6 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
         origin: { y: 0.5 },
       });
     } else {
-      // Reabrir eleição
       onUpdateElection({
         ...election,
         status: 'active',
@@ -162,235 +160,245 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4 space-y-8">
-      
-      {/* Cabeçalho com Status e Botão de Encerramento */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6 border-white/10">
+    <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-6">
+
+      {/* Cabeçalho com Status e Botão de Encerramento em Ilha */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Auditoria Fim-a-Fim (E2E-V)</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>AUDITORIA FIM-A-FIM (E2E-V)</span>
             </span>
             {isClosed ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-red-500/10 border border-red-500/30 text-red-400">
                 <Ban className="w-3.5 h-3.5" />
                 VOTAÇÃO ENCERRADA (RESULTADO OFICIAL)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400">
                 <Lock className="w-3.5 h-3.5" />
                 VOTAÇÃO EM ANDAMENTO (APURAÇÃO LACRADA)
               </span>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white font-display">
-            {isClosed ? 'Resultado Oficial Homologado' : 'Apuração & Transparência Eleitoral'}
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            {isClosed ? 'RESULTADO OFICIAL HOMOLOGADO' : 'APURAÇÃO & TRANSPARÊNCIA ELEITORAL'}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs text-zinc-400 mt-1 max-w-xl">
             {isClosed
               ? 'A votação foi encerrada. Todos os votos foram totalizados e estão selados no Boletim de Urna.'
-              : 'A votação está em andamento. Em conformidade com o sigilo eleitoral, os votos permanecem lacrados e só serão revelados após o encerramento oficial.'}
+              : 'Votação em andamento. Conforme o princípio de sigilo do voto, os votos permanecem lacrados até o término oficial.'}
           </p>
         </div>
 
         {onUpdateElection && (
           <button
             onClick={handleToggleCloseElection}
-            className={`btn-primary text-xs sm:text-sm py-2.5 px-5 font-bold ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-semibold transition-all shrink-0 ${
               isClosed
-                ? 'bg-slate-800 text-slate-200 border border-white/20'
-                : 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30'
+                ? 'island-btn'
+                : 'bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25 shadow-md shadow-red-500/20'
             }`}
           >
             {isClosed ? (
               <>
                 <RotateCcw className="w-4 h-4" />
-                <span>Reabrir Votação (Modo Teste)</span>
+                <span>REABRIR VOTAÇÃO</span>
               </>
             ) : (
               <>
                 <Ban className="w-4 h-4" />
-                <span>Encerrar Votação Oficial</span>
+                <span>ENCERRAR VOTAÇÃO</span>
               </>
             )}
           </button>
         )}
       </div>
 
-      {/* SEÇÃO 1: APURAÇÃO DOS VOTOS POR CANDIDATO (UNIVERSAL VERIFIABILITY) */}
+      {/* SEÇÃO 1: APURAÇÃO DOS VOTOS */}
       {!isClosed ? (
-        /* ESTADO LACRADO: Votação Aberta (Votos Ocultos) */
-        <div className="glass-panel p-8 sm:p-12 text-center space-y-6 border-amber-500/20 bg-gradient-to-b from-slate-900/90 to-slate-950/90 shadow-xl">
-          <div className="inline-flex p-4 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10">
-            <Lock className="w-12 h-12" />
+        /* ESTADO LACRADO DURANTE A ELEIÇÃO (Regra de Sigilo) */
+        <div className="p-8 sm:p-12 rounded-3xl bg-zinc-950/70 border border-amber-500/30 backdrop-blur-md text-center space-y-6 shadow-2xl">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+            <Lock className="w-8 h-8" />
           </div>
 
           <div className="max-w-xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
               <Lock className="w-3.5 h-3.5" />
-              <span>Apuração Lacrada Durante o Pleito</span>
+              <span>APURAÇÃO LACRADA DURANTE O PLEITO</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-bold text-white font-display">
-              Votação em Andamento (Votos Ocultos)
+            
+            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              VOTAÇÃO EM ANDAMENTO (VOTOS OCULTOS)
             </h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Para preservar a inviolabilidade do voto e a lisura do pleito eleitoral, <strong>os votos e resultados por candidato não são revelados enquanto a votação estiver aberta</strong>.
+            
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+              Para preservar a inviolabilidade do voto e a lisura do pleito,{' '}
+              <strong className="text-white">os votos e resultados por candidato não são revelados enquanto a votação estiver aberta</strong>.
             </p>
-            <p className="text-xs text-slate-400">
-              Cada voto está sendo registrado e embaralhado de forma anônima no Registro Digital do Voto (RDV) de cada urna, com raízes de Merkle autênticas. Os resultados finais serão revelados imediatamente após o encerramento oficial.
+            <p className="text-xs text-zinc-500 font-mono">
+              Cada cédula é registrada anonimamente no RDV de cada urna. Os totais serão revelados após o encerramento oficial.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2 text-xs">
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Status da Seção</div>
-              <div className="text-base font-bold text-emerald-400 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>Votação Ativa</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2">
+            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">STATUS DA SEÇÃO</div>
+              <div className="flex items-center gap-2 text-sm font-bold font-mono text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>VOTAÇÃO ATIVA</span>
               </div>
-              <div className="text-[11px] text-slate-500">Cabines coletando votos dos eleitores</div>
+              <div className="text-[11px] text-zinc-500 font-mono">Cabines coletando votos</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Urnas Operando</div>
-              <div className="text-base font-bold text-white">
-                {election.urnas.length} {election.urnas.length === 1 ? 'Terminal Ativo' : 'Terminais Ativos'}
+            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">URNAS OPERANDO</div>
+              <div className="text-sm font-bold font-mono text-white">
+                {election.urnas.length} {election.urnas.length === 1 ? 'TERMINAL ATIVO' : 'TERMINAIS ATIVOS'}
               </div>
-              <div className="text-[11px] text-slate-500">Assinaturas Ed25519 em modo seguro</div>
+              <div className="text-[11px] text-zinc-500 font-mono">Assinaturas Ed25519</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Sigilo Garantido</div>
-              <div className="text-base font-bold text-cyan-400 flex items-center gap-1.5">
+            <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">SIGILO GARANTIDO</div>
+              <div className="flex items-center gap-1.5 text-sm font-bold font-mono text-emerald-400">
                 <ShieldCheck className="w-4 h-4" />
-                <span>RDV Embaralhado</span>
+                <span>RDV EMBARALHADO</span>
               </div>
-              <div className="text-[11px] text-slate-500">Apuração bloqueada até o fechamento</div>
+              <div className="text-[11px] text-zinc-500 font-mono">Bloqueado até o fechamento</div>
             </div>
           </div>
 
           {onUpdateElection && (
-            <div className="pt-2">
+            <div className="pt-3">
               <button
                 onClick={handleToggleCloseElection}
-                className="btn-primary py-3 px-6 text-sm font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25 shadow-lg shadow-red-500/20 transition-all"
               >
                 <Ban className="w-4 h-4" />
-                <span>Encerrar Votação Oficial para Liberar os Votos</span>
+                <span>ENCERRAR VOTAÇÃO OFICIAL PARA LIBERAR OS VOTOS</span>
               </button>
             </div>
           )}
         </div>
       ) : (
-        /* ESTADO REVELADO: Votação Encerrada (Exibição dos Resultados) */
+        /* ESTADO REVELADO (HOMOLOGADO) */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Gráfico de Barras dos Candidatos */}
-          <div className="lg:col-span-8 glass-panel p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+
+          {/* Gráfico de Barras dos Candidatos em Ilha */}
+          <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
               <div>
-                <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase">
+                <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase tracking-wider">
                   <BarChart3 className="w-4 h-4" />
-                  <span>Cargo: {election.roleTitle}</span>
+                  <span>CARGO: {election.roleTitle}</span>
                 </div>
-                <h3 className="text-xl font-bold text-white font-display mt-0.5">
-                  Total de Votos por Candidato
+                <h3 className="text-base font-bold text-white tracking-tight mt-1">
+                  TOTAL DE VOTOS POR CANDIDATO
                 </h3>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-black text-white font-display">
+                <div className="text-2xl sm:text-3xl font-black text-white font-mono">
                   {totalVotesAcrossUrnas}
                 </div>
-                <div className="text-[11px] text-slate-400 font-mono">votos computados</div>
+                <div className="text-[11px] text-zinc-400 font-mono">VOTOS COMPUTADOS</div>
               </div>
             </div>
 
-            {/* Candidato Mais Votado / Vencedor */}
+            {/* Candidato Vencedor em Ilha com Destaque */}
             {winner ? (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-purple-950/30 to-slate-900 border border-emerald-500/40 flex items-center justify-between shadow-lg">
-                <div className="flex items-center gap-3">
+              <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-emerald-500/10">
+                <div className="flex items-center gap-4">
                   <img
                     src={winner.photoUrl}
                     alt={winner.name}
-                    className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-400 shadow-md"
+                    className="w-16 h-16 rounded-2xl object-cover border border-emerald-500/40 shadow-md"
                   />
                   <div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase font-mono">
+                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider mb-1">
                       <Award className="w-4 h-4" />
                       <span>ELEITO / VENCEDOR</span>
                     </div>
-                    <div className="text-lg font-bold text-white font-display">
+                    <div className="font-extrabold text-lg text-white">
                       {winner.name}
                     </div>
-                    <div className="text-xs text-slate-300">
+                    <div className="text-xs text-zinc-400 font-mono mt-0.5">
                       Nº {winner.number} • {winner.partyOrSlate}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right sm:text-right w-full sm:w-auto">
                   <div className="text-3xl font-black text-emerald-400 font-mono">
                     {winner.percentage}%
                   </div>
-                  <div className="text-xs text-slate-400 font-mono">
-                    {winner.votes} votos
-                  </div>
+                  <div className="text-xs text-zinc-400 font-mono">{winner.votes} VOTOS</div>
                 </div>
               </div>
             ) : (
-              <div className="p-6 text-center text-slate-400 bg-slate-950/40 rounded-xl border border-white/5 font-mono text-xs">
-                Nenhum voto computado nesta eleição.
+              <div className="p-6 rounded-xl bg-zinc-900/60 border border-zinc-800 text-center font-mono text-xs text-zinc-400">
+                NENHUM VOTO COMPUTADO NESTA ELEIÇÃO.
               </div>
             )}
 
-            {/* Lista de Barras de Progresso de Cada Candidato */}
-            <div className="space-y-4 pt-2">
+            {/* Barras de Progresso Arredondadas */}
+            <div className="space-y-3 pt-2">
               {candidateTotals.map((c) => (
-                <div key={c.number} className="space-y-1.5 bg-slate-950/40 p-3 rounded-xl border border-white/5">
-                  <div className="flex justify-between items-center text-xs sm:text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-black text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                <div
+                  key={c.number}
+                  className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/80 space-y-2 hover:border-zinc-700 transition-all"
+                >
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-bold text-zinc-900 bg-emerald-400 px-2 py-0.5 rounded-full text-xs font-mono">
                         Nº {c.number}
                       </span>
-                      <span className="font-bold text-white">{c.name}</span>
-                      <span className="text-[11px] text-slate-400 hidden sm:inline">({c.partyOrSlate})</span>
+                      <span className="font-bold text-white text-sm">{c.name}</span>
+                      <span className="text-zinc-500 hidden sm:inline">
+                        ({c.partyOrSlate})
+                      </span>
                     </div>
-                    <div className="text-right font-mono">
-                      <strong className="text-white font-bold">{c.votes}</strong>
-                      <span className="text-slate-400 ml-1">votos ({c.percentage}%)</span>
+                    <div className="text-right">
+                      <strong className="text-white text-sm font-bold">{c.votes}</strong>
+                      <span className="text-zinc-400 ml-1.5 text-xs">({c.percentage}%)</span>
                     </div>
                   </div>
-                  <div className="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                  
+                  {/* Barra Arredondada Moderna */}
+                  <div className="w-full h-2.5 rounded-full bg-zinc-800/80 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-emerald-400 rounded-full transition-all duration-700"
-                      style={{ width: `${Math.max(parseFloat(c.percentage), totalVotesAcrossUrnas > 0 ? 3 : 0)}%` }}
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-sm shadow-emerald-500/30 transition-all duration-500"
+                      style={{
+                        width: `${Math.max(parseFloat(c.percentage), totalVotesAcrossUrnas > 0 ? 3 : 0)}%`,
+                      }}
                     />
                   </div>
                 </div>
               ))}
 
-              {/* Totais de Brancos e Nulos */}
+              {/* Brancos e Nulos */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
-                  <span className="text-slate-400">Votos em Branco:</span>
-                  <span className="font-mono font-bold text-white">{blankVotesTotal}</span>
+                <div className="p-3.5 rounded-xl bg-zinc-900/40 border border-zinc-800 flex justify-between items-center text-xs font-mono">
+                  <span className="text-zinc-400">VOTOS EM BRANCO:</span>
+                  <span className="font-bold text-white text-sm">{blankVotesTotal}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 flex justify-between items-center text-xs">
-                  <span className="text-slate-400">Votos Nulos:</span>
-                  <span className="font-mono font-bold text-white">{nullVotesTotal}</span>
+                <div className="p-3.5 rounded-xl bg-zinc-900/40 border border-zinc-800 flex justify-between items-center text-xs font-mono">
+                  <span className="text-zinc-400">VOTOS NULOS:</span>
+                  <span className="font-bold text-white text-sm">{nullVotesTotal}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Auditoria das Urnas & Critérios */}
+          {/* Painel Lateral: Urnas & Garantias em Ilha */}
           <div className="lg:col-span-4 space-y-6">
-            
+
             {/* Status das Urnas */}
-            <div className="glass-panel p-6 space-y-4">
-              <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
-                <Layers className="w-4 h-4 text-purple-400" />
-                <span>Votos por Urna Registrada</span>
+            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
+              <h4 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-white">
+                <Layers className="w-4 h-4 text-emerald-400" />
+                <span>VOTOS POR TERMINAL</span>
               </h4>
 
               <div className="space-y-2.5">
@@ -399,15 +407,15 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                   return (
                     <div
                       key={u.id}
-                      className="p-3.5 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between text-xs"
+                      className="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-800 flex items-center justify-between text-xs font-mono"
                     >
                       <div>
                         <div className="font-bold text-white">{u.id}</div>
-                        <div className="text-[11px] text-slate-400">{u.location}</div>
+                        <div className="text-[11px] text-zinc-400">{u.location}</div>
                       </div>
                       <div className="text-right">
-                        <span className="font-mono font-bold text-emerald-400 text-sm">{votesInUrna}</span>
-                        <span className="text-[10px] text-slate-500 block">votos na urna</span>
+                        <span className="font-bold text-emerald-400 text-base">{votesInUrna}</span>
+                        <span className="block text-[10px] text-zinc-500">VOTOS</span>
                       </div>
                     </div>
                   );
@@ -415,32 +423,27 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
               </div>
             </div>
 
-            {/* Critérios de Integridade */}
-            <div className="glass-panel p-6 space-y-3.5">
-              <h4 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
+            {/* Garantias Criptográficas */}
+            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
+              <h4 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-white">
                 <FileCheck2 className="w-4 h-4 text-emerald-400" />
-                <span>Garantias Criptográficas</span>
+                <span>GARANTIAS CRIPTOGRÁFICAS</span>
               </h4>
 
-              <div className="space-y-3 text-xs">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span className="text-slate-300">
-                    <strong>Não-Duplicidade:</strong> Cada eleitor possui PIN único inutilizado no ato do voto.
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span className="text-slate-300">
-                    <strong>Voto Secreto:</strong> O RDV embaralha ordens aleatoriamente sem identificação pessoal.
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span className="text-slate-300">
-                    <strong>Merkle Root On-Chain:</strong> Raiz de comprovantes gravada na Solana.
-                  </span>
-                </div>
+              <div className="space-y-3 text-xs font-mono text-zinc-400">
+                {[
+                  { label: 'Não-Duplicidade:', text: 'Cada eleitor possui PIN de uso único destruído após votar.' },
+                  { label: 'Voto Secreto:', text: 'O RDV embaralha as cédulas sem dados do eleitor.' },
+                  { label: 'Merkle Root On-Chain:', text: 'Raiz imutável transmitida para a Solana.' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span>
+                      <strong className="text-white">{item.label}</strong>{' '}
+                      {item.text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -449,81 +452,80 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
         </div>
       )}
 
-      {/* SEÇÃO 2: VERIFICAÇÃO INDIVIDUAL DO COMPROVANTE (INDIVIDUAL E2E-V) */}
-      <div className="glass-panel p-6 sm:p-8 border-emerald-500/30 bg-gradient-to-b from-emerald-950/20 to-slate-900/60">
+      {/* SEÇÃO 2: VERIFICAÇÃO INDIVIDUAL DO COMPROVANTE (MERKLE PROOF) EM ILHA */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <div className="inline-flex p-3 rounded-2xl bg-emerald-500/20 text-emerald-400">
-            <Sparkles className="w-8 h-8" />
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md shadow-emerald-500/20">
+            <Sparkles className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-white font-display">
-            Verifique se o seu Voto foi Computado
+          
+          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+            VERIFIQUE SE O SEU VOTO FOI COMPUTADO
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300">
-            Insira o código do seu comprovante de votação (Ex: <code className="text-emerald-400 font-mono">URNSOL-XXXX-YYYY</code>) para validar a prova de inclusão na Árvore de Merkle da Solana:
+          
+          <p className="text-xs text-zinc-400 font-mono">
+            Insira o código do seu comprovante impresso (Ex: <code className="text-emerald-400 bg-black/40 px-1.5 py-0.5 rounded border border-zinc-800">URNASOL-XXXX-YYYY</code>) para validar a prova matemática de inclusão na Árvore de Merkle:
           </p>
 
           {/* Campo de Busca de Recibo */}
-          <form onSubmit={handleVerifyReceipt} className="flex flex-col sm:flex-row gap-3 pt-2">
+          <form onSubmit={handleVerifyReceipt} className="flex flex-col sm:flex-row gap-2.5 pt-2">
             <div className="relative flex-1">
-              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input
                 type="text"
-                placeholder="Digite seu código de comprovante..."
+                placeholder="INSIRA SEU CÓDIGO DE COMPROVANTE..."
                 value={receiptInput}
                 onChange={(e) => setReceiptInput(e.target.value)}
-                className="w-full bg-slate-950/90 border border-white/20 rounded-xl pl-12 pr-4 py-3 text-sm sm:text-base text-white font-mono placeholder-slate-500 focus:outline-none focus:border-emerald-500 shadow-inner"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={isVerifying || !receiptInput.trim()}
-              className="btn-primary py-3 px-6 justify-center text-sm font-bold"
+              className="island-btn-primary rounded-xl text-xs py-2.5 px-5 shrink-0"
             >
-              {isVerifying ? 'Auditando...' : 'Auditar Voto'}
+              {isVerifying ? 'AUDITANDO...' : 'AUDITAR VOTO'}
             </button>
           </form>
 
           {/* Resultado Positivo da Verificação */}
           {verificationResult && verificationResult.isValid && (
-            <div className="mt-6 p-6 rounded-2xl bg-slate-950 border border-emerald-500/50 text-left space-y-4 animate-fade-in shadow-2xl shadow-emerald-500/10">
-              <div className="flex items-center gap-3 text-emerald-400 border-b border-emerald-500/20 pb-4">
-                <div className="p-2 rounded-xl bg-emerald-500/20">
-                  <CheckCircle2 className="w-6 h-6" />
+            <div className="mt-6 p-6 rounded-2xl bg-zinc-900/80 border border-emerald-500/40 text-left space-y-4 shadow-xl animate-fade-in">
+              <div className="flex items-center gap-3 pb-3 border-b border-zinc-800">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold font-display text-white">
+                  <h4 className="text-sm font-bold text-white tracking-tight">
                     {isClosed
                       ? 'VOTO 100% COMPUTADO NO RESULTADO OFICIAL!'
-                      : 'COMPROVANTE VÁLIDO • CÉDULA REGISTRADA E LACRADA NO RDV!'}
+                      : 'COMPROVANTE VÁLIDO — CÉDULA REGISTRADA E LACRADA NO RDV!'}
                   </h4>
                   <p className="text-xs text-emerald-400 font-mono">
                     {isClosed
                       ? 'Prova Matemática de Inclusão (Merkle Proof) Válida'
-                      : 'Prova Matemática Válida • O voto será totalizado no encerramento da eleição'}
+                      : 'Prova Matemática Válida • O voto será consolidado no fechamento'}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs font-mono text-slate-300">
-                <div className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-white/5">
-                  <span className="text-slate-400">Urna de Origem:</span>
-                  <span className="text-white font-bold">{verificationResult.urnaId}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-white/5">
-                  <span className="text-slate-400">Índice no Registro (RDV):</span>
-                  <span className="text-white">Folha #{verificationResult.leafIndex + 1}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-white/5 break-all">
-                  <span className="text-slate-400">Hash da sua Cédula (Leaf):</span>
-                  <span className="text-emerald-300">{verificationResult.leaf}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-white/5 break-all">
-                  <span className="text-slate-400">Raiz Merkle Gravada na Solana:</span>
-                  <span className="text-purple-300 font-bold">{verificationResult.root}</span>
-                </div>
+              <div className="space-y-2 text-xs font-mono text-zinc-400">
+                {[
+                  { label: 'URNA DE ORIGEM:', value: verificationResult.urnaId, bold: true },
+                  { label: 'ÍNDICE NO REGISTRO (RDV):', value: `FOLHA #${verificationResult.leafIndex + 1}` },
+                  { label: 'HASH DA SUA CÉDULA (LEAF):', value: verificationResult.leaf, accent: true },
+                  { label: 'RAIZ MERKLE GRAVADA NA SOLANA:', value: verificationResult.root, emerald: true },
+                ].map((row) => (
+                  <div key={row.label} className="flex flex-col sm:flex-row sm:justify-between py-1 border-b border-zinc-800/80 break-all">
+                    <span>{row.label}</span>
+                    <span className={row.emerald ? 'text-emerald-400 font-bold' : row.accent ? 'text-white' : 'text-zinc-300'}>
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
               </div>
 
-              {/* Dados On-Chain da Solana */}
+              {/* Dados On-Chain */}
               {(() => {
                 const onChainRecords = solanaService.getOnChainElectionData(election.id);
                 const activeRecord = onChainRecords.find((r) => r.urnaId === verificationResult.urnaId) || onChainRecords[0];
@@ -531,55 +533,51 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`;
 
                 return (
-                  <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-2">
+                  <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 text-purple-300 font-bold">
+                      <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
                         <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                        <span>Registro Oficial On-Chain na Solana Devnet</span>
+                        <span>REGISTRO OFICIAL ON-CHAIN NA SOLANA DEVNET</span>
                       </div>
                       <a
                         href={explorerUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-[11px] inline-flex items-center gap-1 font-semibold transition-all"
+                        className="island-btn rounded-lg text-xs py-1 px-2.5"
                       >
                         <ExternalLink className="w-3 h-3" />
-                        <span>Abrir Transação no Solana Explorer</span>
+                        <span>VER NO EXPLORER</span>
                       </a>
                     </div>
-                    
-                    <div className="text-[11px] font-mono text-slate-300 break-all space-y-1">
+
+                    <div className="text-[11px] font-mono text-zinc-400 break-all space-y-1">
                       <div>
-                        <span className="text-slate-400">Assinatura da TX: </span>
-                        <code className="text-emerald-400">{txSig}</code>
+                        <span>ASSINATURA DA TX: </span>
+                        <code className="text-zinc-300">{txSig}</code>
                       </div>
                       <div>
-                        <span className="text-slate-400">Raiz On-Chain no Bloco: </span>
-                        <code className="text-purple-300">{verificationResult.root.slice(0, 16)}...</code>
+                        <span>RAIZ ON-CHAIN: </span>
+                        <code className="text-emerald-400">{verificationResult.root.slice(0, 20)}...</code>
                       </div>
                     </div>
                   </div>
                 );
               })()}
 
-              {/* Script de Auditoria Independente para o Usuário / Perito */}
-              <div className="p-3.5 rounded-xl bg-slate-900 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-slate-200 font-semibold">
-                    <Terminal className="w-4 h-4 text-emerald-400" />
-                    <span>Auditoria Independente via Terminal (Sem depender do site):</span>
-                  </div>
+              {/* Script de Auditoria Independente */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
+                  <Terminal className="w-4 h-4 text-emerald-400" />
+                  <span>AUDITORIA INDEPENDENTE VIA TERMINAL:</span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Qualquer pessoa pode rodar o verificador criptográfico em sua própria máquina apontando direto para a rede Solana:
+                <p className="text-xs text-zinc-400 font-mono">
+                  Qualquer cidadão pode rodar o verificador criptográfico em sua própria máquina:
                 </p>
-                <div className="p-2.5 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-emerald-300 flex items-center justify-between gap-2">
+                <div className="p-3 rounded-lg bg-black/80 border border-zinc-800 flex items-center justify-between gap-2 text-xs font-mono text-emerald-400">
                   <code>node auditar-voto.mjs {receiptInput.trim()}</code>
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(`node auditar-voto.mjs ${receiptInput.trim()}`);
-                    }}
-                    className="p-1 rounded bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
+                    onClick={() => navigator.clipboard.writeText(`node auditar-voto.mjs ${receiptInput.trim()}`)}
+                    className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
                     title="Copiar comando"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -587,10 +585,11 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
                 </div>
               </div>
 
-              <div className="bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/20 text-xs text-slate-300 flex items-start gap-2">
+              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-start gap-2.5 text-xs font-mono text-zinc-400">
                 <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Sigilo Preservado:</strong> A matemática prova que sua cédula foi somada no total da eleição sem revelar a ninguém qual foi a sua escolha.
+                  <strong className="text-white">Sigilo Preservado:</strong>{' '}
+                  A matemática prova que sua cédula foi inclusa na soma total sem revelar publicamente qual foi o seu voto.
                 </span>
               </div>
             </div>
@@ -598,12 +597,14 @@ export const AuditoriaPortal: React.FC<AuditoriaPortalProps> = ({
 
           {/* Erro de Comprovante Não Encontrado */}
           {errorNotFound && (
-            <div className="mt-6 p-4 rounded-xl bg-orange-950/40 border border-orange-500/40 text-left flex items-start gap-3 animate-fade-in">
-              <XCircle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
-              <div className="text-xs space-y-1">
-                <div className="font-bold text-white">Comprovante não localizado</div>
-                <p className="text-slate-300">
-                  Verifique se o código foi digitado corretamente (Ex: <code className="text-white">URNSOL-XXXX-YYYY</code>) ou vote primeiro na cabine para gerar um comprovante válido.
+            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-left flex items-start gap-3 animate-fade-in">
+              <XCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs font-mono">
+                <div className="font-bold text-amber-300 mb-1">COMPROVANTE NÃO LOCALIZADO</div>
+                <p className="text-zinc-400">
+                  Verifique se o código foi digitado corretamente (Ex:{' '}
+                  <code className="text-emerald-400 bg-black/40 px-1 py-0.5 rounded border border-zinc-800">URNASOL-XXXX-YYYY</code>)
+                  ou emita seu voto na cabine da urna antes de auditar.
                 </p>
               </div>
             </div>

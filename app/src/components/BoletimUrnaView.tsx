@@ -167,22 +167,22 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-6 px-4 space-y-6">
-      
-      {/* Título & Ações Principais */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 space-y-6">
+
+      {/* Título & Ações Principais em Ilha */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
         <div>
-          <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold tracking-wider text-emerald-400 uppercase">
             <FileText className="w-4 h-4" />
-            <span>Fechamento da Seção Eleitoral</span>
+            <span>FECHAMENTO DA SEÇÃO ELEITORAL</span>
           </div>
-          <h1 className="text-2xl font-black text-white font-display">
-            Boletim de Urna (BU) Digital & Assinado
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            BOLETIM DE URNA (BU) DIGITAL
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-xs text-zinc-400 mt-1">
             {isClosed
-              ? 'Relatório oficial emitido após o término da votação, assinado com Ed25519 e exportável para a Solana.'
-              : 'O Boletim de Urna com a contagem de votos só é emitido após o encerramento oficial da eleição.'}
+              ? 'Relatório oficial emitido após o término da votação, assinado com Ed25519 pela urna.'
+              : 'O BU com a contagem oficial de votos só é liberado após o encerramento da eleição.'}
           </p>
         </div>
 
@@ -190,29 +190,22 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
           {!isClosed && onUpdateElection && (
             <button
               onClick={handleCloseElection}
-              className="btn-primary text-xs bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 shadow-sm shadow-red-500/20 transition-all"
             >
               <Ban className="w-4 h-4" />
-              <span>Encerrar Votação Oficial</span>
+              <span>ENCERRAR VOTAÇÃO</span>
             </button>
           )}
 
           {isClosed && (
             <>
-              <button
-                onClick={loadOrGenerateBU}
-                className="btn-secondary text-xs"
-                title="Recalcular apuração com novos votos"
-              >
-                <RefreshCw className="w-4 h-4" />
-                <span>Recalcular BU</span>
+              <button onClick={loadOrGenerateBU} className="island-btn rounded-xl text-xs">
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>RECALCULAR</span>
               </button>
-              <button
-                onClick={() => window.print()}
-                className="btn-secondary text-xs"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Imprimir BU</span>
+              <button onClick={() => window.print()} className="island-btn rounded-xl text-xs">
+                <Printer className="w-3.5 h-3.5" />
+                <span>IMPRIMIR</span>
               </button>
             </>
           )}
@@ -220,472 +213,423 @@ export const BoletimUrnaView: React.FC<BoletimUrnaViewProps> = ({
       </div>
 
       {!isClosed ? (
-        /* ESTADO BLOQUEADO DO BOLETIM DE URNA ENQUANTO A VOTAÇÃO ESTIVER ABERTA */
-        <div className="glass-panel p-8 sm:p-12 text-center space-y-6 border-amber-500/20 bg-gradient-to-b from-slate-900/90 to-slate-950/90 shadow-xl">
-          <div className="inline-flex p-4 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10">
-            <Lock className="w-12 h-12" />
+        /* ESTADO BLOQUEADO — votação em aberto (Regra de Sigilo) */
+        <div className="p-8 sm:p-12 rounded-3xl bg-zinc-950/70 border border-amber-500/30 backdrop-blur-md text-center space-y-6 shadow-2xl">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+            <Lock className="w-8 h-8" />
           </div>
 
           <div className="max-w-xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
               <Lock className="w-3.5 h-3.5" />
-              <span>Boletim Bloqueado • Votação em Aberto</span>
+              <span>BOLETIM BLOQUEADO • VOTAÇÃO EM ABERTO</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-bold text-white font-display">
-              Boletim de Urna (BU) Indisponível
+            
+            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              BOLETIM DE URNA (BU) INDISPONÍVEL
             </h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              O Boletim de Urna (BU) com a totalização de votos desta seção <strong>não pode ser emitido ou visualizado enquanto a votação estiver em andamento</strong>, protegendo o sigilo e a lisura do pleito.
+            
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+              O BU com a totalização de votos{' '}
+              <strong className="text-white">não pode ser emitido enquanto a votação estiver em andamento</strong>,
+              garantindo o sigilo absoluto do voto e a lisura do pleito.
             </p>
-            <p className="text-xs text-slate-400">
-              Conforme as normas da Justiça Eleitoral, a urna eletrônica só consolida e assina o BU após o encerramento oficial da seção. Encerre a eleição para emitir o relatório impresso e exportá-lo para a rede Solana.
+            <p className="text-xs text-zinc-500 font-mono">
+              A urna só consolida os votos e assina o BU digitalmente com Ed25519 após o encerramento da seção.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2 text-xs">
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Seção / Urna</div>
-              <div className="text-base font-bold text-white font-mono">{selectedUrna.id}</div>
-              <div className="text-[11px] text-slate-500">{selectedUrna.name}</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Local de Votação</div>
-              <div className="text-sm font-bold text-slate-200">{selectedUrna.location}</div>
-              <div className="text-[11px] text-slate-500">Cabine física em operação segura</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 space-y-1">
-              <div className="text-[11px] font-mono text-slate-400 uppercase">Status do Relatório</div>
-              <div className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Lacrado no RDV</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto text-left pt-2">
+            {[
+              { label: 'SEÇÃO / URNA', value: selectedUrna.id, sub: selectedUrna.name },
+              { label: 'LOCAL DE VOTAÇÃO', value: selectedUrna.location, sub: 'Cabine física em operação' },
+              { label: 'STATUS DO RELATÓRIO', value: 'LACRADO NO RDV', sub: 'Aguardando encerramento', warn: true },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1"
+              >
+                <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                  {item.label}
+                </div>
+                <div className={`text-sm font-bold font-mono ${item.warn ? 'text-amber-400' : 'text-white'}`}>
+                  {item.warn && <Lock className="w-3.5 h-3.5 inline mr-1" />}
+                  {item.value}
+                </div>
+                <div className="text-[11px] text-zinc-500 font-mono">{item.sub}</div>
               </div>
-              <div className="text-[11px] text-slate-500">Aguardando encerramento</div>
-            </div>
+            ))}
           </div>
 
           {onUpdateElection && (
-            <div className="pt-2">
+            <div className="pt-3">
               <button
                 onClick={handleCloseElection}
-                className="btn-primary py-3 px-6 text-sm font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25 shadow-lg shadow-red-500/20 transition-all"
               >
                 <Ban className="w-4 h-4" />
-                <span>Encerrar Votação Oficial para Emitir o BU</span>
+                <span>ENCERRAR VOTAÇÃO OFICIAL PARA EMITIR O BU</span>
               </button>
             </div>
           )}
         </div>
       ) : (
         <>
-          {/* Banner de Status de Transmissão para a Solana */}
-      {submissionResult ? (
-        <div className="glass-panel p-5 border-emerald-500/50 bg-emerald-950/20 animate-fade-in space-y-3">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400">
-              <CheckCircle2 className="w-7 h-7" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white font-display">
-                  Boletim de Urna Registrado com Sucesso!
-                </h3>
-                {submissionResult.isLiveOnChain ? (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase">
-                    Ao Vivo na Solana Devnet
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase">
-                    Criptografia Air-Gap Local
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-slate-300">
-                A Raiz de Merkle e a apuração da seção foram validadas criptograficamente contra a chave Ed25519 da Urna.
-              </p>
-              
-              <div className="pt-2 flex flex-wrap gap-4 text-xs font-mono">
-                <div>
-                  <span className="text-slate-400">Slot Solana: </span>
-                  <span className="text-emerald-400 font-bold">#{submissionResult.slot}</span>
+          {/* Banner de Status de Transmissão Solana em Ilha */}
+          {submissionResult ? (
+            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-emerald-500/30 backdrop-blur-md shadow-xl animate-fade-in space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md shadow-emerald-500/20 shrink-0">
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <div>
-                  <span className="text-slate-400">Identificador da TX: </span>
-                  <span className="text-white">{submissionResult.txSignature.slice(0, 20)}...</span>
-                </div>
-              </div>
-
-              {submissionResult.isLiveOnChain ? (
-                <div className="pt-3 flex gap-3">
-                  <a
-                    href={submissionResult.explorerUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-primary text-xs py-1.5 px-3"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Ver no Solana Explorer Oficial</span>
-                  </a>
-                  <button
-                    onClick={onGoToAuditoria}
-                    className="btn-secondary text-xs py-1.5 px-3"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Auditar Votos e Comprovantes</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-3 p-3.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs space-y-3">
-                  <p className="text-slate-300">
-                    ℹ️ <strong>Nota sobre o Solana Explorer:</strong> O BU foi gravado em modo seguro local porque a carteira não tinha taxa de rede na Devnet pública. Para publicar uma transação visível no Solana Explorer, coloque 0.01 SOL gratuito de teste na carteira e transmita novamente.
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <h3 className="text-base font-bold text-white tracking-tight">
+                      BU REGISTRADO COM SUCESSO!
+                    </h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                      {submissionResult.isLiveOnChain ? 'AO VIVO NA SOLANA DEVNET' : 'CRIPTOGRAFIA AIR-GAP LOCAL'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-300 font-mono">
+                    A Raiz de Merkle e a apuração foram validadas criptograficamente contra a chave Ed25519 da Urna.
                   </p>
-                  
-                  <div className="p-3 rounded-lg bg-slate-900/90 border border-white/5 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
-                      <span className="text-slate-400">Carteira da Eleição:</span>
-                      <code className="text-emerald-400 bg-black/40 px-2 py-0.5 rounded border border-white/5 font-bold">
-                        {submissionResult.organizerPubkey}
-                      </code>
-                      <button
-                        onClick={handleCopyKey}
-                        className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white transition-colors inline-flex items-center gap-1"
-                      >
-                        <Copy className="w-3 h-3" />
-                        <span>{copiedKey ? 'Copiado!' : 'Copiar'}</span>
-                      </button>
+
+                  <div className="pt-1 flex flex-wrap gap-4 text-xs font-mono text-zinc-400">
+                    <div>
+                      <span>SLOT SOLANA: </span>
+                      <strong className="text-white">#{submissionResult.slot}</strong>
                     </div>
+                    <div>
+                      <span>TX ID: </span>
+                      <strong className="text-emerald-400">{submissionResult.txSignature.slice(0, 24)}...</strong>
+                    </div>
+                  </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-slate-300 text-[11px]">
-                      <div className="flex items-center gap-1">
-                        <span>Saldo Devnet:</span>
-                        <span className={`font-mono font-bold ${organizerBalance && organizerBalance > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                          {loadingBalance ? 'Consultando...' : organizerBalance !== null ? `${organizerBalance.toFixed(4)} SOL` : '0.0000 SOL'}
-                        </span>
-                        <button
-                          onClick={refreshBalance}
-                          disabled={loadingBalance}
-                          className="hover:text-white transition-colors text-[10px] underline ml-1"
-                        >
-                          (Atualizar)
-                        </button>
-                      </div>
-
+                  {submissionResult.isLiveOnChain ? (
+                    <div className="pt-2 flex flex-wrap gap-3">
                       <a
-                        href="https://faucet.solana.com"
+                        href={submissionResult.explorerUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 inline-flex items-center gap-1 font-semibold"
+                        className="island-btn-primary rounded-xl text-xs"
                       >
-                        <Coins className="w-3 h-3" />
-                        <span>Abrir Faucet Oficial (faucet.solana.com)</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>VER NO SOLANA EXPLORER</span>
                       </a>
+                      <button onClick={onGoToAuditoria} className="island-btn rounded-xl text-xs">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>AUDITAR VOTOS</span>
+                      </button>
                     </div>
+                  ) : (
+                    <div className="mt-3 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-3 text-xs font-mono">
+                      <p className="text-zinc-400">
+                        O BU foi gravado em modo seguro local porque a carteira não possuía taxa de rede na Devnet pública.
+                      </p>
+
+                      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="text-zinc-400">CARTEIRA DA ELEIÇÃO:</span>
+                          <code className="text-emerald-400 px-2 py-0.5 rounded bg-black/40 border border-zinc-800">
+                            {submissionResult.organizerPubkey}
+                          </code>
+                          <button
+                            onClick={handleCopyKey}
+                            className="island-btn rounded-lg text-xs py-1 px-2"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>{copiedKey ? 'COPIADO!' : 'COPIAR'}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="pt-1 flex flex-wrap gap-2.5">
+                        <button
+                          onClick={handleTransmitToSolana}
+                          disabled={isSubmitting}
+                          className="island-btn-primary rounded-xl text-xs"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          <span>{isSubmitting ? 'TRANSMITINDO...' : 'TRANSMITIR NOVAMENTE'}</span>
+                        </button>
+                        <button onClick={onGoToAuditoria} className="island-btn rounded-xl text-xs">
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>IR PARA AUDITORIA</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white tracking-tight">
+                      BOLETIM ASSINADO OFFLINE PELA URNA (ED25519)
+                    </h4>
+                    <p className="text-xs text-zinc-400 font-mono mt-0.5">
+                      Pronto para transmissão. Qualquer dispositivo com acesso à internet pode enviar para a Solana.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={handleTransmitToSolana}
+                    disabled={isSubmitting || !buPayload}
+                    className="island-btn-primary rounded-xl text-xs w-full sm:w-auto"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>REGISTRANDO NA SOLANA...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>TRANSMITIR PARA A SOLANA</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Painel da Carteira */}
+              <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs font-mono">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2 text-zinc-400">
+                    <Wallet className="w-4 h-4 text-emerald-400" />
+                    <span className="font-bold text-white">Payer Solana:</span>
+                    <span className="text-emerald-400 px-2 py-0.5 rounded bg-black/40 border border-zinc-800 text-[11px] max-w-[240px] sm:max-w-xs truncate">
+                      {organizerPubkey}
+                    </span>
+                    <button onClick={handleCopyKey} className="island-btn rounded-lg text-xs py-0.5 px-2">
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedKey ? 'COPIADO' : 'COPIAR'}</span>
+                    </button>
                   </div>
 
-                  <div className="pt-1 flex flex-wrap gap-3">
+                  <div className="flex flex-wrap items-center gap-2 text-zinc-400 text-[11px]">
+                    <span>SALDO DEVNET:</span>
+                    <span className={`font-bold ${organizerBalance && organizerBalance > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {loadingBalance ? 'CONSULTANDO...' : organizerBalance !== null ? `${organizerBalance.toFixed(4)} SOL` : '0.0000 SOL'}
+                    </span>
                     <button
-                      onClick={handleTransmitToSolana}
-                      disabled={isSubmitting}
-                      className="btn-primary text-xs py-2 px-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-bold"
+                      onClick={refreshBalance}
+                      disabled={loadingBalance}
+                      className="text-zinc-500 hover:text-zinc-300 underline text-[11px]"
                     >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{isSubmitting ? 'Transmitindo...' : 'Transmitir Novamente para a Solana Devnet'}</span>
-                    </button>
-                    <button
-                      onClick={onGoToAuditoria}
-                      className="btn-secondary text-xs py-1.5 px-3"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Ir para Auditoria</span>
+                      (atualizar)
                     </button>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                  <button
+                    onClick={handleRequestAirdrop}
+                    disabled={isAirdropping}
+                    className="island-btn rounded-xl text-xs flex-1 md:flex-initial"
+                  >
+                    <Coins className="w-3.5 h-3.5" />
+                    <span>{isAirdropping ? 'SOLICITANDO...' : 'AIRDROP RÁPIDO'}</span>
+                  </button>
+                  <a
+                    href="https://faucet.solana.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="island-btn rounded-xl text-xs flex-1 md:flex-initial"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>FAUCET</span>
+                  </a>
+                </div>
+              </div>
+
+              {airdropMsg && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-300">
+                  {airdropMsg}
+                </div>
+              )}
+
+              {errorMessage && (
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2 text-xs font-mono text-amber-300">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{errorMessage}</span>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="glass-panel p-5 border-purple-500/30 bg-purple-950/10 space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400">
-                <Lock className="w-6 h-6" />
+          )}
+
+          {/* Grid: Fita Térmica + QR Code em Ilhas Flutuantes */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            {/* FITA TÉRMICA OFICIAL DO BOLETIM DE URNA */}
+            <div className="lg:col-span-7 rounded-2xl bg-zinc-950/85 border border-zinc-800/80 p-6 sm:p-8 font-mono text-xs leading-relaxed shadow-xl">
+
+              <div className="text-center pb-4 mb-4 border-b border-dashed border-zinc-800">
+                <div className="font-bold tracking-widest text-zinc-300 text-sm">
+                  REPÚBLICA FEDERATIVA DO BRASIL
+                </div>
+                <div className="font-semibold text-zinc-400 mt-0.5">
+                  JUSTIÇA ELEITORAL DIGITAL • URNASOL
+                </div>
+                <div className="mt-2 font-bold text-white uppercase">
+                  {election.institutionName}
+                </div>
+                <div className="text-[11px] text-zinc-500">{election.title}</div>
+                {isClosed && (
+                  <div className="mt-2 font-bold text-emerald-400 uppercase tracking-wider text-[11px]">
+                    [ ELEIÇÃO ENCERRADA E HOMOLOGADA ]
+                  </div>
+                )}
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">
-                  Boletim Assinado Offline pela Urna (Chave Ed25519)
-                </h4>
-                <p className="text-xs text-slate-400">
-                  Pronto para transmissão. Qualquer celular com conexão pode enviar para a Solana.
+
+              <div className="pb-3 mb-3 space-y-1.5 border-b border-zinc-800 text-[11px]">
+                {[
+                  { label: 'IDENTIFICAÇÃO DA URNA:', value: selectedUrna.id, bold: true },
+                  { label: 'LOCAL DE VOTAÇÃO:', value: selectedUrna.location },
+                  { label: 'DATA DA APURAÇÃO:', value: new Date(buPayload?.timestamp || Date.now()).toLocaleDateString('pt-BR') },
+                  { label: 'HORA DO FECHAMENTO:', value: new Date(buPayload?.timestamp || Date.now()).toLocaleTimeString('pt-BR') },
+                ].map((row) => (
+                  <div key={row.label} className="flex justify-between">
+                    <span className="text-zinc-500">{row.label}</span>
+                    <span className={row.bold ? 'font-bold text-white' : 'text-zinc-300'}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pb-3 mb-3 space-y-1.5 border-b border-zinc-800 text-[11px]">
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">ZERÉSIMA INICIAL:</span>
+                  <span className="font-bold text-emerald-400">AUDITADA (0 VOTOS)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">ELEITORES APTOS CADASTRADOS:</span>
+                  <span className="font-bold text-white">{election.registeredVoters}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">COMPARECIMENTO NESTA URNA:</span>
+                  <span className="font-bold text-white">{buPayload?.totalVotes || 0}</span>
+                </div>
+              </div>
+
+              {/* Apuração dos Votos por Cargo */}
+              <div className="pb-4 mb-4 border-b border-dashed border-zinc-800">
+                <div className="font-bold text-center uppercase tracking-wider text-xs mb-3 text-emerald-400">
+                  APURAÇÃO DO CARGO: {election.roleTitle}
+                </div>
+
+                <div className="space-y-2">
+                  {buPayload?.candidateTallies.map((c) => (
+                    <div
+                      key={c.candidateNumber}
+                      className="flex justify-between items-center py-1 border-b border-zinc-900"
+                    >
+                      <div>
+                        <span className="font-bold text-white mr-2">Nº {c.candidateNumber}</span>
+                        <span className="text-zinc-400">{c.candidateName}</span>
+                      </div>
+                      <span className="font-bold text-sm text-emerald-400">{c.votes}</span>
+                    </div>
+                  ))}
+
+                  <div className="flex justify-between py-1 border-b border-zinc-900">
+                    <span className="text-zinc-400">VOTOS EM BRANCO</span>
+                    <span className="font-bold text-white">{buPayload?.blankVotes || 0}</span>
+                  </div>
+
+                  <div className="flex justify-between py-1 border-b border-zinc-900">
+                    <span className="text-zinc-400">VOTOS NULOS</span>
+                    <span className="font-bold text-white">{buPayload?.nullVotes || 0}</span>
+                  </div>
+
+                  <div className="flex justify-between pt-2 text-sm font-bold text-white">
+                    <span>TOTAL DE VOTOS:</span>
+                    <span className="text-emerald-400">{buPayload?.totalVotes || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Auditoria Criptográfica */}
+              <div className="space-y-2 text-[10px] text-zinc-400 break-all">
+                <div className="font-bold text-center uppercase tracking-widest text-zinc-300 mb-2">
+                  GARANTIA DE INTEGRIDADE CRIPTOGRÁFICA
+                </div>
+
+                <div>
+                  <span className="font-bold text-white block">RAIZ DE MERKLE DOS RECIBOS (32 BYTES):</span>
+                  <span className="block mt-1 p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-emerald-400 text-[10px]">
+                    {buPayload?.merkleRoot || '...'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold text-white block">ASSINATURA ED25519 DA URNA:</span>
+                  <span className="block mt-1 p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px]">
+                    {buPayload?.ed25519Signature.slice(0, 56)}...
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold text-white block">CHAVE PÚBLICA DA URNA (SOLANA PUBKEY):</span>
+                  <span className="block mt-1 p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px]">
+                    {selectedUrna.publicKey}
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-center pt-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                FIM DO BOLETIM DE URNA • URNASOL
+              </div>
+            </div>
+
+            {/* PAINEL DO QR CODE EM ILHA */}
+            <div className="lg:col-span-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 p-6 space-y-5 shadow-xl">
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+                  <QrCode className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-sm text-white tracking-tight">
+                  QR CODE DO BOLETIM DE URNA
+                </h3>
+                <p className="text-xs text-zinc-400 mt-1 font-mono">
+                  Escaneie com qualquer leitor para validar e transmitir o BU para a Solana.
                 </p>
               </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <button
-                onClick={handleTransmitToSolana}
-                disabled={isSubmitting || !buPayload}
-                className="btn-primary w-full sm:w-auto justify-center"
-              >
-                {isSubmitting ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Registrando na Solana...</span>
-                  </>
+              <div className="max-w-[260px] mx-auto p-4 rounded-2xl bg-white shadow-xl">
+                {qrCodeUrl ? (
+                  <img
+                    src={qrCodeUrl}
+                    alt="QR Code do Boletim de Urna"
+                    className="w-full h-auto rounded-lg"
+                  />
                 ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Transmitir para a Solana</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Painel da Carteira da Eleição (Payer na Solana Devnet) */}
-          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2 text-slate-300">
-                <Wallet className="w-4 h-4 text-emerald-400" />
-                <span className="font-semibold text-white">Carteira Transmissora (Payer Devnet):</span>
-                <span className="font-mono text-emerald-400 bg-black/40 px-2 py-0.5 rounded border border-white/5 text-[11px] truncate max-w-[220px] sm:max-w-[340px]">
-                  {organizerPubkey}
-                </span>
-                <button
-                  onClick={handleCopyKey}
-                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white transition-colors inline-flex items-center gap-1 font-mono text-[11px]"
-                >
-                  <Copy className="w-3 h-3" />
-                  <span>{copiedKey ? 'Copiado!' : 'Copiar'}</span>
-                </button>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 text-slate-400 text-[11px]">
-                <span>Saldo na Devnet:</span>
-                <span className={`font-mono font-bold ${organizerBalance && organizerBalance > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {loadingBalance ? 'Consultando...' : organizerBalance !== null ? `${organizerBalance.toFixed(4)} SOL` : '0.0000 SOL'}
-                </span>
-                <button
-                  onClick={refreshBalance}
-                  disabled={loadingBalance}
-                  className="hover:text-white transition-colors text-[10px] underline ml-1"
-                  title="Atualizar saldo"
-                >
-                  (Atualizar)
-                </button>
-                {organizerBalance && organizerBalance > 0 ? (
-                  <span className="text-emerald-400 text-[10px] font-semibold">✓ Saldo pronto para transação ao vivo no Explorer</span>
-                ) : (
-                  <span className="text-slate-400 text-[10px]">
-                    (Coloque 0.01 SOL para gravar transação pública no Explorer)
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <button
-                onClick={handleRequestAirdrop}
-                disabled={isAirdropping}
-                className="btn-secondary text-xs py-1.5 px-3 flex-1 md:flex-initial justify-center"
-                title="Tentar airdrop automático via RPC"
-              >
-                <Coins className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{isAirdropping ? 'Solicitando...' : 'Airdrop Rápido'}</span>
-              </button>
-              <a
-                href="https://faucet.solana.com"
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 font-semibold text-xs inline-flex items-center justify-center gap-1.5 flex-1 md:flex-initial transition-all"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Abrir Faucet Oficial</span>
-              </a>
-            </div>
-          </div>
-
-          {airdropMsg && (
-            <div className="mt-2 text-xs text-cyan-300 font-mono bg-cyan-950/40 p-2 rounded-lg border border-cyan-500/30">
-              {airdropMsg}
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mt-2 text-xs text-orange-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Grid Principal: Fita Térmica do BU vs QR Code de Transmissão */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* FITA TÉRMICA OFICIAL DO BOLETIM DE URNA */}
-        <div className="lg:col-span-7 thermal-receipt p-6 sm:p-8 text-xs leading-relaxed">
-          
-          <div className="text-center border-b-2 border-dashed border-gray-400 pb-4 mb-4">
-            <div className="font-bold tracking-wider text-sm">REPÚBLICA FEDERATIVA DO BRASIL</div>
-            <div className="font-bold">JUSTIÇA ELEITORAL DIGITAL • URNASOL</div>
-            <div className="mt-2 text-[11px] font-bold uppercase">{election.institutionName}</div>
-            <div className="text-[10px] text-gray-700">{election.title}</div>
-            {isClosed && (
-              <div className="mt-1 font-bold text-red-700 uppercase tracking-widest text-[11px]">
-                [ ELEIÇÃO ENCERRADA E HOMOLOGADA ]
-              </div>
-            )}
-          </div>
-
-          <div className="border-b border-gray-300 pb-3 mb-3 space-y-1 font-mono text-[11px]">
-            <div className="flex justify-between">
-              <span>IDENTIFICAÇÃO DA URNA:</span>
-              <span className="font-bold">{selectedUrna.id}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>LOCAL DE VOTAÇÃO:</span>
-              <span>{selectedUrna.location}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>DATA DA APURAÇÃO:</span>
-              <span>{new Date(buPayload?.timestamp || Date.now()).toLocaleDateString('pt-BR')}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>HORA DO FECHAMENTO:</span>
-              <span>{new Date(buPayload?.timestamp || Date.now()).toLocaleTimeString('pt-BR')}</span>
-            </div>
-          </div>
-
-          <div className="border-b border-gray-300 pb-3 mb-3 font-mono text-[11px] space-y-1">
-            <div className="flex justify-between text-gray-700">
-              <span>ZERÉSIMA INICIAL:</span>
-              <span className="font-bold text-green-700">AUDITADA (0 VOTOS)</span>
-            </div>
-            <div className="flex justify-between">
-              <span>ELEITORES APTOS CADASTRADOS:</span>
-              <span className="font-bold">{election.registeredVoters}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>COMPARECIMENTO NESTA URNA:</span>
-              <span className="font-bold">{buPayload?.totalVotes || 0}</span>
-            </div>
-          </div>
-
-          {/* Apuração dos Votos por Cargo */}
-          <div className="border-b-2 border-dashed border-gray-400 pb-4 mb-4">
-            <div className="font-bold text-center uppercase tracking-widest text-[11px] mb-3">
-              APURAÇÃO DO CARGO: {election.roleTitle}
-            </div>
-
-            <div className="space-y-2 font-mono">
-              {buPayload?.candidateTallies.map((c) => (
-                <div key={c.candidateNumber} className="flex justify-between items-center py-0.5 border-b border-gray-200">
-                  <div>
-                    <span className="font-bold text-gray-900 mr-2">Nº {c.candidateNumber}</span>
-                    <span>{c.candidateName}</span>
+                  <div className="w-56 h-56 flex items-center justify-center text-xs font-mono text-zinc-600">
+                    GERANDO QR CODE...
                   </div>
-                  <span className="font-bold text-sm">{c.votes}</span>
+                )}
+              </div>
+
+              <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-2 text-xs font-mono text-zinc-400">
+                <div className="font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>COMO FUNCIONA O AIR-GAP:</span>
                 </div>
-              ))}
-
-              <div className="flex justify-between py-0.5 border-b border-gray-200 text-gray-700">
-                <span>VOTOS EM BRANCO</span>
-                <span className="font-bold">{buPayload?.blankVotes || 0}</span>
-              </div>
-
-              <div className="flex justify-between py-0.5 border-b border-gray-200 text-gray-700">
-                <span>VOTOS NULOS</span>
-                <span className="font-bold">{buPayload?.nullVotes || 0}</span>
-              </div>
-
-              <div className="flex justify-between pt-2 text-sm font-black text-black">
-                <span>TOTAL DE VOTOS COMPUTADOS:</span>
-                <span>{buPayload?.totalVotes || 0}</span>
+                <p>1. A Urna nunca se conecta à internet durante a votação.</p>
+                <p>2. O QR Code contém a apuração oficial, a raiz da Árvore de Merkle e a assinatura Ed25519.</p>
+                <p>3. Qualquer cidadão com conexão pode transmitir os dados para a Solana sem poder alterá-los.</p>
               </div>
             </div>
+
           </div>
-
-          {/* Auditoria Criptográfica */}
-          <div className="font-mono text-[10px] space-y-2 text-gray-800 break-all">
-            <div className="font-bold text-center uppercase text-[10px] tracking-wider mb-2">
-              GARANTIA DE INTEGRIDADE CRIPTOGRÁFICA
-            </div>
-
-            <div>
-              <span className="font-bold block">RAIZ DE MERKLE DOS RECIBOS (32 BYTES):</span>
-              <span className="bg-gray-200 px-1 py-0.5 rounded font-mono text-[9px] block mt-0.5">
-                {buPayload?.merkleRoot || '...'}
-              </span>
-            </div>
-
-            <div>
-              <span className="font-bold block">ASSINATURA ED25519 DA URNA:</span>
-              <span className="bg-gray-200 px-1 py-0.5 rounded font-mono text-[9px] block mt-0.5">
-                {buPayload?.ed25519Signature.slice(0, 48)}...
-              </span>
-            </div>
-
-            <div>
-              <span className="font-bold block">CHAVE PÚBLICA DA URNA (SOLANA PUBKEY):</span>
-              <span className="bg-gray-200 px-1 py-0.5 rounded font-mono text-[9px] block mt-0.5">
-                {selectedUrna.publicKey}
-              </span>
-            </div>
-          </div>
-
-          <div className="text-center pt-6 text-[10px] font-bold text-gray-500 font-mono uppercase">
-            FIM DO BOLETIM DE URNA • URNASOL
-          </div>
-        </div>
-
-        {/* PAINEL DO QR CODE PARA TRANSMISSÃO */}
-        <div className="lg:col-span-5 glass-panel p-6 space-y-5">
-          <div className="text-center">
-            <div className="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-400 mb-2">
-              <QrCode className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-white font-display">
-              QR Code do Boletim de Urna
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Escaneie este QR Code com qualquer smartphone para transmitir a apuração oficial para a Solana.
-            </p>
-          </div>
-
-          <div className="bg-white p-4 rounded-2xl max-w-[280px] mx-auto shadow-xl">
-            {qrCodeUrl ? (
-              <img
-                src={qrCodeUrl}
-                alt="QR Code do Boletim de Urna"
-                className="w-full h-auto rounded"
-              />
-            ) : (
-              <div className="w-60 h-60 flex items-center justify-center text-slate-400 font-mono text-xs">
-                Gerando QR Code...
-              </div>
-            )}
-          </div>
-
-          <div className="bg-slate-950/60 border border-white/5 rounded-xl p-4 text-xs text-slate-300 space-y-2">
-            <div className="font-bold text-white flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Como funciona o Air-Gap:</span>
-            </div>
-            <p className="text-slate-400">
-              1. A Urna nunca se conecta à internet durante a votação.
-            </p>
-            <p className="text-slate-400">
-              2. O QR Code contém a contagem agregada, a raiz da Árvore de Merkle e a assinatura digital Ed25519.
-            </p>
-            <p className="text-slate-400">
-              3. Qualquer cidadão com internet pode transmitir os dados para a Solana sem conseguir alterar nenhum voto.
-            </p>
-          </div>
-        </div>
-
-      </div>
         </>
       )}
 

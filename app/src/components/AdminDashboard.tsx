@@ -192,155 +192,152 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4 space-y-6">
-      
-      {/* Cabeçalho */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-6">
+
+      {/* Cabeçalho em Ilha */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-lg">
         <div>
-          <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold tracking-wider text-emerald-400 uppercase">
             <Settings className="w-4 h-4" />
-            <span>Configuração do Pleito</span>
+            <span>CONFIGURAÇÃO DO PLEITO</span>
           </div>
-          <h1 className="text-2xl font-black text-white font-display">
-            Painel Administrativo do Organizador
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            PAINEL ADMINISTRATIVO
           </h1>
-          <p className="text-sm text-slate-400">
-            Gerencie candidatos, credenciamento de urnas físicas, pacotes de carga e parâmetros da eleição na Solana.
+          <p className="text-xs text-zinc-400 mt-1">
+            Gerencie candidatos, urnas físicas, pacotes de carga e parâmetros da eleição.
           </p>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={handleDownloadCargaPackage}
-            className="btn-primary text-xs"
-          >
-            <Download className="w-4 h-4" />
-            <span>Exportar Carga das Urnas</span>
+        <div className="flex flex-wrap gap-2.5">
+          <button onClick={handleDownloadCargaPackage} className="island-btn-primary rounded-xl text-xs">
+            <Download className="w-3.5 h-3.5" />
+            <span>EXPORTAR CARGA</span>
           </button>
           <button
             onClick={handleResetDemoVotes}
-            className="btn-secondary text-xs text-orange-400 hover:text-orange-300"
+            className="island-btn rounded-xl text-xs text-red-400 hover:text-red-300 hover:border-red-500/30 hover:bg-red-500/10"
             title="Limpar votos para reiniciar demonstração"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>Reset Demo</span>
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>RESET DEMO</span>
           </button>
         </div>
       </div>
 
       {/* Alerta de Feedback */}
       {successNotice && (
-        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-medium flex items-center gap-2 animate-fade-in">
-          <CheckCircle className="w-4 h-4" />
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-300 flex items-center gap-2 animate-fade-in shadow-sm">
+          <CheckCircle className="w-4 h-4 text-emerald-400" />
           <span>{successNotice}</span>
         </div>
       )}
 
-      {/* Seletor de Abas */}
-      <div className="flex gap-2 border-b border-white/10 pb-2">
+      {/* Seletor de Abas em Formato Pill */}
+      <div className="flex gap-2 border-b border-zinc-800 pb-3">
         <button
           onClick={() => setActiveTab('geral')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase font-mono transition-all ${
+          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
             activeTab === 'geral'
-              ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
           }`}
         >
-          Parâmetros da Eleição
+          PARÂMETROS
         </button>
         <button
           onClick={() => setActiveTab('candidatos')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase font-mono transition-all ${
+          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
             activeTab === 'candidatos'
-              ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
           }`}
         >
-          Candidatos ({election.candidates.length})
+          CANDIDATOS ({election.candidates.length})
         </button>
         <button
           onClick={() => setActiveTab('urnas')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase font-mono transition-all ${
+          className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all ${
             activeTab === 'urnas'
-              ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
           }`}
         >
-          Urnas Credenciadas ({election.urnas.length})
+          URNAS ({election.urnas.length})
         </button>
       </div>
 
       {/* ABA GERAL */}
       {activeTab === 'geral' && (
         <div className="space-y-6">
-          
-          {/* Card de Predefinições Rápidas (Condomínio / Escola) */}
-          <div className="glass-panel p-6">
-            <h3 className="text-sm font-bold text-white uppercase font-mono mb-2">
-              Modelos Prontos para Apresentação
+
+          {/* Predefinições em Ilha */}
+          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-1">
+              MODELOS PRONTOS PARA APRESENTAÇÃO
             </h3>
-            <p className="text-xs text-slate-400 mb-4">
-              Alterne rapidamente entre cenários do mundo real (condomínio ou escola) com candidatos e eleitores pré-configurados:
+            <p className="text-xs text-zinc-400 mb-5">
+              Alterne rapidamente entre cenários práticos com candidatos e eleitores pré-configurados:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={handlePresetCondo}
-                className="p-4 rounded-xl border border-white/10 hover:border-emerald-500/50 bg-slate-950/40 text-left transition-all hover:bg-white/5 group"
+                className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all text-left group shadow-md"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400 group-hover:text-emerald-400">
+                <div className="flex items-center gap-3.5 mb-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
                     <Building className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Eleição de Condomínio</h4>
-                    <span className="text-[11px] text-slate-400">Síndico Geral & Moradores</span>
+                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">ELEIÇÃO DE CONDOMÍNIO</h4>
+                    <span className="text-xs text-zinc-400 font-mono">SÍNDICO GERAL & MORADORES</span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400">
-                  Ideal para condomínios residenciais. Votantes identificados por número de apartamento.
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Eleitores organizados por número de apartamento e bloco residencial.
                 </p>
               </button>
 
               <button
                 onClick={handlePresetSchool}
-                className="p-4 rounded-xl border border-white/10 hover:border-emerald-500/50 bg-slate-950/40 text-left transition-all hover:bg-white/5 group"
+                className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all text-left group shadow-md"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 group-hover:text-emerald-400">
+                <div className="flex items-center gap-3.5 mb-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Eleição Escolar / Grêmio</h4>
-                    <span className="text-[11px] text-slate-400">Diretor & Representantes</span>
+                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">ELEIÇÃO ESCOLAR / GRÊMIO</h4>
+                    <span className="text-xs text-zinc-400 font-mono">DIRETOR & REPRESENTANTES</span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400">
-                  Ideal para instituições de ensino e universidades. Votantes identificados por matrícula.
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Eleitores cadastrados por matrícula estudantil e turmas ativas.
                 </p>
               </button>
             </div>
           </div>
 
-          {/* Dados On-Chain na Solana */}
-          <div className="glass-panel p-6 space-y-3">
-            <h3 className="text-sm font-bold text-white uppercase font-mono flex items-center gap-2">
-              <Key className="w-4 h-4 text-emerald-400" />
-              <span>Contas PDA On-Chain na Solana</span>
+          {/* Dados On-Chain em Ilha */}
+          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl space-y-4">
+            <h3 className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+              <Key className="w-4 h-4" />
+              <span>CONTAS PDA ON-CHAIN NA SOLANA</span>
             </h3>
 
-            <div className="space-y-2 text-xs font-mono text-slate-300">
-              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-white/5">
-                <span className="text-slate-400">Program ID (Anchor):</span>
-                <span className="text-emerald-400 font-bold">{election.solanaProgramId}</span>
+            <div className="space-y-2 text-xs font-mono text-zinc-400">
+              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-zinc-800/80">
+                <span>PROGRAM ID (ANCHOR):</span>
+                <span className="text-white font-bold">{election.solanaProgramId}</span>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-white/5">
-                <span className="text-slate-400">ID da Eleição (Seed):</span>
+              <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-zinc-800/80">
+                <span>ID DA ELEIÇÃO (SEED):</span>
                 <span className="text-white font-bold">{election.id}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between py-2">
-                <span className="text-slate-400">Cluster Alvo:</span>
-                <span className="text-purple-400 font-bold">Solana Devnet (Confirmed)</span>
+                <span>CLUSTER ALVO:</span>
+                <span className="text-emerald-400 font-bold">SOLANA DEVNET (CONFIRMED)</span>
               </div>
             </div>
           </div>
@@ -351,16 +348,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ABA CANDIDATOS */}
       {activeTab === 'candidatos' && (
         <div className="space-y-6">
-          
-          {/* Formulário de Novo Candidato */}
-          <div className="glass-panel p-6">
-            <h3 className="text-sm font-bold text-white uppercase font-mono mb-4">
-              Cadastrar Novo Candidato
+
+          {/* Formulário de Novo Candidato em Ilha */}
+          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-4">
+              CADASTRAR NOVO CANDIDATO
             </h3>
             <form onSubmit={handleAddCandidate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
-                  Número (2 Dígitos) *
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  NÚMERO (2 DIG.) *
                 </label>
                 <input
                   type="number"
@@ -368,13 +365,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: 40"
                   value={candNumber}
                   onChange={(e) => setCandNumber(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
-                  Nome Completo *
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  NOME COMPLETO *
                 </label>
                 <input
                   type="text"
@@ -382,52 +379,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: Ana Paula Martins"
                   value={candName}
                   onChange={(e) => setCandName(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
-                  Chapa / Partido
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  CHAPA / PARTIDO
                 </label>
                 <input
                   type="text"
                   placeholder="Ex: Chapa 4 - Renovação"
                   value={candSlate}
                   onChange={(e) => setCandSlate(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div className="flex items-end">
-                <button
-                  type="submit"
-                  className="btn-primary w-full justify-center h-[38px] text-xs"
-                >
+                <button type="submit" className="island-btn-primary rounded-xl w-full h-[38px] text-xs">
                   <Plus className="w-4 h-4" />
-                  <span>Adicionar</span>
+                  <span>ADICIONAR</span>
                 </button>
               </div>
             </form>
           </div>
 
-          {/* Lista de Candidatos */}
+          {/* Lista de Candidatos em Ilhas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {election.candidates.map((c) => (
-              <div key={c.number} className="glass-panel p-4 flex gap-4 items-center">
+              <div
+                key={c.number}
+                className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex gap-4 items-center shadow-lg hover:border-zinc-700 transition-all"
+              >
                 <img
                   src={c.photoUrl}
                   alt={c.name}
-                  className="w-16 h-16 rounded-xl object-cover border-2 border-white/10 shadow-md"
+                  className="w-16 h-16 rounded-2xl object-cover border border-zinc-700 shadow-md shrink-0"
                 />
                 <div>
-                  <div className="text-xl font-black font-mono text-emerald-400">
+                  <div className="text-xl font-black text-emerald-400 font-mono">
                     Nº {c.number}
                   </div>
-                  <div className="text-sm font-bold text-white font-display">
+                  <div className="text-sm font-bold text-white tracking-tight">
                     {c.name}
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-zinc-400 font-mono mt-0.5">
                     {c.partyOrSlate}
                   </div>
                 </div>
@@ -441,16 +438,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* ABA URNAS */}
       {activeTab === 'urnas' && (
         <div className="space-y-6">
-          
-          {/* Formulário de Credenciamento de Nova Urna */}
-          <div className="glass-panel p-6">
-            <h3 className="text-sm font-bold text-white uppercase font-mono mb-4">
-              Credenciar Nova Urna Física (Geração de Chave Ed25519)
+
+          {/* Formulário de Credenciamento de Nova Urna em Ilha */}
+          <div className="p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-4">
+              CREDENCIAR NOVA URNA FÍSICA (ED25519)
             </h3>
             <form onSubmit={handleAddUrna} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
-                  Identificador da Urna *
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  IDENTIFICADOR *
                 </label>
                 <input
                   type="text"
@@ -458,13 +455,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: URNA-03"
                   value={urnaIdInput}
                   onChange={(e) => setUrnaIdInput(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 uppercase"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono uppercase focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
-                  Nome Descritivo *
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1.5">
+                  NOME DESCRITIVO *
                 </label>
                 <input
                   type="text"
@@ -472,48 +469,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="Ex: Urna 03 - Auditório"
                   value={urnaNameInput}
                   onChange={(e) => setUrnaNameInput(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-xs font-mono focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all"
                 />
               </div>
 
               <div className="flex items-end">
-                <button
-                  type="submit"
-                  className="btn-primary w-full justify-center h-[38px] text-xs"
-                >
+                <button type="submit" className="island-btn-primary rounded-xl w-full h-[38px] text-xs">
                   <Plus className="w-4 h-4" />
-                  <span>Gerar & Credenciar</span>
+                  <span>GERAR & CREDENCIAR</span>
                 </button>
               </div>
             </form>
           </div>
 
-          {/* Lista de Urnas Credenciadas */}
+          {/* Lista de Urnas Credenciadas em Ilhas */}
           <div className="space-y-3">
             {election.urnas.map((u) => (
-              <div key={u.id} className="glass-panel p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <div
+                key={u.id}
+                className="p-5 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg hover:border-zinc-700 transition-all text-xs font-mono"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-inner shrink-0">
                     <HardDrive className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="font-bold text-white text-sm flex items-center gap-2">
-                      <span>{u.name}</span>
-                      <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-800 text-emerald-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-white text-sm">{u.name}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
                         {u.id}
                       </span>
                     </div>
-                    <div className="text-slate-400 mt-0.5">
-                      Localização: {u.location}
-                    </div>
-                    <div className="font-mono text-[10px] text-slate-500 mt-1">
-                      Chave Pública Ed25519: {u.publicKey}
+                    <div className="text-zinc-400 text-xs">LOCAL: {u.location}</div>
+                    <div className="text-zinc-500 text-[11px] mt-0.5 break-all">
+                      ED25519: {u.publicKey}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-center">
-                  <span className="px-2.5 py-1 rounded-full font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <div className="self-end sm:self-center shrink-0">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
                     AUTORIZADA ON-CHAIN
                   </span>
                 </div>

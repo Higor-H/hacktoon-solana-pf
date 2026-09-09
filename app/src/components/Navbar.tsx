@@ -10,9 +10,11 @@ import {
   Volume2, 
   VolumeX,
   Ban,
-  CheckCircle2,
-  Lock
+  Lock,
+  Sun,
+  Moon
 } from 'lucide-react';
+import type { ThemeType } from '../App';
 
 export type TabType = 'urna' | 'mesario' | 'bu' | 'auditoria' | 'admin';
 
@@ -26,6 +28,8 @@ interface NavbarProps {
   electionTitle: string;
   electionStatus?: 'draft' | 'active' | 'closed';
   onToggleCloseElection?: () => void;
+  theme: ThemeType;
+  setTheme: (t: ThemeType) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -38,202 +42,191 @@ export const Navbar: React.FC<NavbarProps> = ({
   electionTitle,
   electionStatus = 'active',
   onToggleCloseElection,
+  theme,
+  setTheme,
 }) => {
   const isClosed = electionStatus === 'closed';
 
   return (
-    <header className="border-b border-white/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* Logo & Título */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-emerald-400 p-[2px] flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
-                <Vote className="w-5 h-5 text-emerald-400" />
-              </div>
+    <header className="sticky top-2 sm:top-3 z-50 px-3 sm:px-6 w-full max-w-7xl mx-auto">
+      <div className="rounded-2xl md:rounded-full bg-zinc-950/85 backdrop-blur-xl border border-zinc-800/80 shadow-2xl shadow-black/60 px-4 sm:px-5 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 transition-all">
+        
+        {/* Esquerda: Logo + Status da Eleição */}
+        <div className="flex items-center justify-between md:justify-start gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-sm shadow-emerald-500/20">
+              <Vote className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight font-display bg-gradient-to-r from-white via-slate-100 to-emerald-400 bg-clip-text text-transparent">
+                <span className="font-bold tracking-tight text-white text-base">
                   UrnaSol
                 </span>
                 {isClosed ? (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/30 uppercase tracking-wider flex items-center gap-1">
-                    <Ban className="w-3 h-3" />
-                    Encerrada
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-red-500/10 text-red-400 border border-red-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                    ENCERRADA
                   </span>
                 ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Votação Aberta
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    VOTAÇÃO ABERTA
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block truncate max-w-xs font-mono">
+              <p className="text-[11px] text-zinc-400 truncate max-w-[200px] sm:max-w-xs font-mono">
                 {electionTitle}
               </p>
             </div>
           </div>
 
-          {/* Navegação Principal */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-white/5">
-            <button
-              onClick={() => setCurrentTab('urna')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                currentTab === 'urna'
-                  ? 'bg-emerald-500 text-slate-950 font-semibold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Vote className="w-4 h-4" />
-              <span>Cabine (Urna)</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('mesario')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                currentTab === 'mesario'
-                  ? 'bg-emerald-500 text-slate-950 font-semibold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              <span>Mesário</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('bu')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                currentTab === 'bu'
-                  ? 'bg-emerald-500 text-slate-950 font-semibold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>Boletim (BU)</span>
-              {!isClosed && (
-                <Lock className="w-3 h-3 text-amber-400 opacity-80" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('auditoria')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                currentTab === 'auditoria'
-                  ? 'bg-emerald-500 text-slate-950 font-semibold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Apuração & Auditoria</span>
-              {!isClosed && (
-                <Lock className="w-3 h-3 text-amber-400 opacity-80" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('admin')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                currentTab === 'admin'
-                  ? 'bg-emerald-500 text-slate-950 font-semibold shadow-md shadow-emerald-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-              <span>Admin</span>
-            </button>
-          </nav>
-
-          {/* Controles de Ambiente: Encerramento / Offline / Áudio */}
-          <div className="flex items-center gap-2">
-            
-            {/* Botão de Encerramento Rápido de Eleição */}
-            {onToggleCloseElection && (
-              <button
-                onClick={onToggleCloseElection}
-                className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                  isClosed
-                    ? 'bg-slate-800 text-slate-300 border-white/20 hover:bg-slate-700'
-                    : 'bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500/25'
-                }`}
-                title={isClosed ? "Reabrir eleição" : "Encerrar votação oficial e lacrar urnas"}
-              >
-                <Ban className="w-3.5 h-3.5" />
-                <span>{isClosed ? 'Reabrir Pleito' : 'Encerrar Votação'}</span>
-              </button>
-            )}
-
-            {/* Toggle Modo Offline Air-Gap */}
+          {/* Botões rápidos mobile para fechar / silenciar */}
+          <div className="flex md:hidden items-center gap-1">
             <button
               onClick={() => setIsOfflineMode(!isOfflineMode)}
-              title={isOfflineMode ? "Modo Offline Ativo (Air-Gap seguro)" : "Modo Online (Sincronizado)"}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                isOfflineMode
-                  ? 'bg-orange-500/15 text-orange-400 border-orange-500/30'
-                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+              title={isOfflineMode ? 'Air-gap ativo' : 'Conectado à Devnet'}
+              className={`p-1.5 rounded-full border text-xs ${
+                isOfflineMode 
+                  ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' 
+                  : 'border-zinc-700 bg-zinc-800/50 text-zinc-300'
               }`}
             >
-              {isOfflineMode ? (
-                <>
-                  <WifiOff className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Urna Offline</span>
-                </>
-              ) : (
-                <>
-                  <Wifi className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Solana Devnet</span>
-                </>
-              )}
+              {isOfflineMode ? <WifiOff className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5" />}
             </button>
-
-            {/* Toggle de Som */}
             <button
               onClick={() => setAudioMuted(!audioMuted)}
-              title={audioMuted ? "Ativar som da urna" : "Silenciar som da urna"}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all border border-white/5"
+              className="p-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300"
             >
-              {audioMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+              {audioMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
             </button>
           </div>
-
         </div>
 
-        {/* Menu Mobile */}
-        <div className="flex md:hidden overflow-x-auto py-2 gap-1 border-t border-white/5 text-xs">
+        {/* Centro: Abas de Navegação em Formato Pill Island */}
+        <nav className="flex items-center justify-center gap-1 overflow-x-auto py-0.5">
           <button
             onClick={() => setCurrentTab('urna')}
-            className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'urna' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all shrink-0 ${
+              currentTab === 'urna'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+            }`}
           >
-            Cabine
+            <Vote className="w-3.5 h-3.5" />
+            <span>Cabine</span>
           </button>
+
           <button
             onClick={() => setCurrentTab('mesario')}
-            className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'mesario' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all shrink-0 ${
+              currentTab === 'mesario'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+            }`}
           >
-            Mesário
+            <Users className="w-3.5 h-3.5" />
+            <span>Mesário</span>
           </button>
+
           <button
             onClick={() => setCurrentTab('bu')}
-            className={`px-3 py-1 rounded-md shrink-0 flex items-center gap-1 ${currentTab === 'bu' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all shrink-0 ${
+              currentTab === 'bu'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+            }`}
           >
-            <span>Boletim (BU)</span>
+            <FileText className="w-3.5 h-3.5" />
+            <span>BU</span>
             {!isClosed && <Lock className="w-2.5 h-2.5 text-amber-400" />}
           </button>
+
           <button
             onClick={() => setCurrentTab('auditoria')}
-            className={`px-3 py-1 rounded-md shrink-0 flex items-center gap-1 ${currentTab === 'auditoria' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all shrink-0 ${
+              currentTab === 'auditoria'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+            }`}
           >
+            <ShieldCheck className="w-3.5 h-3.5" />
             <span>Apuração</span>
             {!isClosed && <Lock className="w-2.5 h-2.5 text-amber-400" />}
           </button>
+
           <button
             onClick={() => setCurrentTab('admin')}
-            className={`px-3 py-1 rounded-md shrink-0 ${currentTab === 'admin' ? 'bg-emerald-500 text-black font-bold' : 'text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all shrink-0 ${
+              currentTab === 'admin'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm shadow-emerald-500/20'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
+            }`}
           >
-            Admin
+            <Settings className="w-3.5 h-3.5" />
+            <span>Admin</span>
+          </button>
+        </nav>
+
+        {/* Direita: Controles de Sistema e Encerramento */}
+        <div className="hidden md:flex items-center gap-2">
+          {/* Botão Encerrar/Reabrir Eleição */}
+          {onToggleCloseElection && (
+            <button
+              onClick={onToggleCloseElection}
+              title={isClosed ? 'Reabrir eleição' : 'Encerrar votação oficial e gerar BUs'}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold transition-all ${
+                isClosed
+                  ? 'border border-zinc-700 bg-zinc-800/60 text-zinc-300 hover:border-zinc-500'
+                  : 'border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 shadow-sm shadow-red-500/20'
+              }`}
+            >
+              <Ban className="w-3 h-3" />
+              <span>{isClosed ? 'REABRIR' : 'ENCERRAR'}</span>
+            </button>
+          )}
+
+          {/* Toggle Offline Air-Gap */}
+          <button
+            onClick={() => setIsOfflineMode(!isOfflineMode)}
+            title={isOfflineMode ? 'Modo Offline Ativo (Air-Gap seguro)' : 'Modo Online (Sincronizado)'}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold transition-all border ${
+              isOfflineMode
+                ? 'border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'
+                : 'border-zinc-700 bg-zinc-800/60 text-zinc-300 hover:border-zinc-500'
+            }`}
+          >
+            {isOfflineMode ? (
+              <>
+                <WifiOff className="w-3 h-3" />
+                <span>AIR-GAP</span>
+              </>
+            ) : (
+              <>
+                <Wifi className="w-3 h-3" />
+                <span>DEVNET</span>
+              </>
+            )}
+          </button>
+
+          {/* Toggle Som */}
+          <button
+            onClick={() => setAudioMuted(!audioMuted)}
+            title={audioMuted ? 'Ativar som da urna' : 'Silenciar som da urna'}
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-zinc-700 bg-zinc-800/60 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
+          >
+            {audioMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          </button>
+
+          {/* Toggle Tema Clean (Dark / Day) */}
+          <button
+            onClick={() => setTheme(theme === 'day' ? 'night' : 'day')}
+            title={theme === 'day' ? 'Mudar para tema Dark' : 'Mudar para tema Claro'}
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-zinc-700 bg-zinc-800/60 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
+          >
+            {theme === 'day' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
           </button>
         </div>
+
       </div>
     </header>
   );
